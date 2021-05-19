@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.2.0.RELEASE</version>
+    <relativePath />
+  </parent>
+
+  <groupId>io.daff</groupId>
+  <artifactId>uacs</artifactId>
+  <packaging>pom</packaging>
+  <version>0.0.1</version>
+
+  <modules>
+    <module>uacs-core</module>
+    <module>uacs-service</module>
+    <module>uacs-cms</module>
+  </modules>
+
+  <properties>
+    <project.build.source.encoding>UTF-8</project.build.source.encoding>
+    <project.reporting.output.encoding>UTF-8</project.reporting.output.encoding>
+    <java.version>1.8</java.version>
+    <project.version>0.0.1</project.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+
+</project>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.daff.uacs.service.mapper.RoleMapper">
+  <resultMap id="BaseResultMap" type="io.daff.uacs.service.entity.po.Role">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="desc" jdbcType="VARCHAR" property="desc" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+    <result column="update_by" jdbcType="BIGINT" property="updateBy" />
+    <result column="create_at" jdbcType="TIMESTAMP" property="createAt" />
+    <result column="update_at" jdbcType="TIMESTAMP" property="updateAt" />
+    <result column="detail" jdbcType="LONGVARCHAR" property="detail" />
+  </resultMap>
+  <sql id="baseSelectFields">
+    `id`, `name`, `desc`, `type`, `create_by`, `update_by`, `create_at`, `update_at`, `detail`
+  </sql>
+  <insert id="batchInsert" keyProperty="id" useGeneratedKeys="true">
+    insert into role(
+	  <trim suffixOverrides=",">
+			<if test="collection[0].id != null">`id`,</if>
+			<if test="collection[0].name != null">`name`,</if>
+			<if test="collection[0].desc != null">`desc`,</if>
+			<if test="collection[0].type != null">`type`,</if>
+			<if test="collection[0].createBy != null">`create_by`,</if>
+			<if test="collection[0].updateBy != null">`update_by`,</if>
+			<if test="collection[0].createAt != null">`create_at`,</if>
+			<if test="collection[0].updateAt != null">`update_at`,</if>
+			<if test="collection[0].detail != null">`detail`,</if>
+	  </trim>
+		)
+		values
+		<foreach collection="list" item="item" separator=",">
+		(
+		<trim suffixOverrides=",">
+			<if test="item.id != null">#{item.id},</if>
+			<if test="item.name != null">#{item.name},</if>
+			<if test="item.desc != null">#{item.desc},</if>
+			<if test="item.type != null">#{item.type},</if>
+			<if test="item.createBy != null">#{item.createBy},</if>
+			<if test="item.updateBy != null">#{item.updateBy},</if>
+			<if test="item.createAt != null">#{item.createAt},</if>
+			<if test="item.updateAt != null">#{item.updateAt},</if>
+			<if test="item.detail != null">#{item.detail},</if>
+		</trim>
+		)
+		</foreach>
+  </insert>
+  <delete id="deleteByIds">
+    delete from role
+	  where `id`
+	  <foreach collection="collection" item="item" open="in (" close=")" separator=",">
+		#{item}
+	  </foreach>
+  </delete>
+  <select id="select" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from role
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="name != null and name != ''">`name` = #{name}</if>
+				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
+				<if test="type != null">`type` = #{type}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectByIds" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from role
+		where `id`
+		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
+			#{item}
+		</foreach>
+  </select>
+  <update id="batchUpdate">
+    <foreach collection="list" item="item" separator=",">
+			update role
+			set
+			<trim suffixOverrides=",">
+				<if test="collection[0].name != null">`name` = #{item.name},</if>
+				<if test="collection[0].desc != null">`desc` = #{item.desc},</if>
+				<if test="collection[0].type != null">`type` = #{item.type},</if>
+				<if test="collection[0].createBy != null">`create_by` = #{item.createBy},</if>
+				<if test="collection[0].updateBy != null">`update_by` = #{item.updateBy},</if>
+				<if test="collection[0].createAt != null">`create_at` = #{item.createAt},</if>
+				<if test="collection[0].updateAt != null">`update_at` = #{item.updateAt},</if>
+				<if test="collection[0].detail != null">`detail` = #{item.detail},</if>
+			</trim>
+			where `id` = #{item.id}
+		</foreach>
+  </update>
+</mapper>

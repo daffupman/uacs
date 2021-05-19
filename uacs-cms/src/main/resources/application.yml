@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: uacs-cms
+  profiles:
+    active: dev
+server:
+  port: 20010
+  servlet:
+    context-path: /uacs
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml

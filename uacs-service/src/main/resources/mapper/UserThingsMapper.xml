@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.daff.uacs.service.mapper.UserThingsMapper">
+  <resultMap id="BaseResultMap" type="io.daff.uacs.service.entity.po.UserThings">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="mobile_phone_no" jdbcType="CHAR" property="mobilePhoneNo" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="salt" jdbcType="VARCHAR" property="salt" />
+    <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl" />
+    <result column="hierarchy_id" jdbcType="CHAR" property="hierarchyId" />
+    <result column="top_hierarchy" jdbcType="CHAR" property="topHierarchy" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="mobile_phone_no_verified" jdbcType="BIT" property="mobilePhoneNoVerified" />
+    <result column="email_verified" jdbcType="BIT" property="emailVerified" />
+    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+    <result column="update_by" jdbcType="BIGINT" property="updateBy" />
+    <result column="create_at" jdbcType="TIMESTAMP" property="createAt" />
+    <result column="update_at" jdbcType="TIMESTAMP" property="updateAt" />
+    <result column="detail" jdbcType="LONGVARCHAR" property="detail" />
+  </resultMap>
+  <sql id="baseSelectFields">
+    `id`, `name`, `nick_name`, `mobile_phone_no`, `email`, `password`, `salt`, `avatar_url`, `hierarchy_id`, `top_hierarchy`, `status`, `mobile_phone_no_verified`, `email_verified`, `create_by`, `update_by`, `create_at`, `update_at`, `detail`
+  </sql>
+  <insert id="batchInsert" keyProperty="id" useGeneratedKeys="true">
+    insert into user_things(
+	  <trim suffixOverrides=",">
+			<if test="collection[0].id != null">`id`,</if>
+			<if test="collection[0].name != null">`name`,</if>
+			<if test="collection[0].nickName != null">`nick_name`,</if>
+			<if test="collection[0].mobilePhoneNo != null">`mobile_phone_no`,</if>
+			<if test="collection[0].email != null">`email`,</if>
+			<if test="collection[0].password != null">`password`,</if>
+			<if test="collection[0].salt != null">`salt`,</if>
+			<if test="collection[0].avatarUrl != null">`avatar_url`,</if>
+			<if test="collection[0].hierarchyId != null">`hierarchy_id`,</if>
+			<if test="collection[0].topHierarchy != null">`top_hierarchy`,</if>
+			<if test="collection[0].status != null">`status`,</if>
+			<if test="collection[0].mobilePhoneNoVerified != null">`mobile_phone_no_verified`,</if>
+			<if test="collection[0].emailVerified != null">`email_verified`,</if>
+			<if test="collection[0].createBy != null">`create_by`,</if>
+			<if test="collection[0].updateBy != null">`update_by`,</if>
+			<if test="collection[0].createAt != null">`create_at`,</if>
+			<if test="collection[0].updateAt != null">`update_at`,</if>
+			<if test="collection[0].detail != null">`detail`,</if>
+	  </trim>
+		)
+		values
+		<foreach collection="list" item="item" separator=",">
+		(
+		<trim suffixOverrides=",">
+			<if test="item.id != null">#{item.id},</if>
+			<if test="item.name != null">#{item.name},</if>
+			<if test="item.nickName != null">#{item.nickName},</if>
+			<if test="item.mobilePhoneNo != null">#{item.mobilePhoneNo},</if>
+			<if test="item.email != null">#{item.email},</if>
+			<if test="item.password != null">#{item.password},</if>
+			<if test="item.salt != null">#{item.salt},</if>
+			<if test="item.avatarUrl != null">#{item.avatarUrl},</if>
+			<if test="item.hierarchyId != null">#{item.hierarchyId},</if>
+			<if test="item.topHierarchy != null">#{item.topHierarchy},</if>
+			<if test="item.status != null">#{item.status},</if>
+			<if test="item.mobilePhoneNoVerified != null">#{item.mobilePhoneNoVerified},</if>
+			<if test="item.emailVerified != null">#{item.emailVerified},</if>
+			<if test="item.createBy != null">#{item.createBy},</if>
+			<if test="item.updateBy != null">#{item.updateBy},</if>
+			<if test="item.createAt != null">#{item.createAt},</if>
+			<if test="item.updateAt != null">#{item.updateAt},</if>
+			<if test="item.detail != null">#{item.detail},</if>
+		</trim>
+		)
+		</foreach>
+  </insert>
+  <delete id="deleteByIds">
+    delete from user_things
+	  where `id`
+	  <foreach collection="collection" item="item" open="in (" close=")" separator=",">
+		#{item}
+	  </foreach>
+  </delete>
+  <select id="select" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from user_things
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="name != null and name != ''">`name` = #{name}</if>
+				<if test="nickName != null and nickName != ''">`nick_name` = #{nickName}</if>
+				<if test="mobilePhoneNo != null and mobilePhoneNo != ''">`mobile_phone_no` = #{mobilePhoneNo}</if>
+				<if test="email != null and email != ''">`email` = #{email}</if>
+				<if test="password != null and password != ''">`password` = #{password}</if>
+				<if test="salt != null and salt != ''">`salt` = #{salt}</if>
+				<if test="avatarUrl != null and avatarUrl != ''">`avatar_url` = #{avatarUrl}</if>
+				<if test="hierarchyId != null and hierarchyId != ''">`hierarchy_id` = #{hierarchyId}</if>
+				<if test="topHierarchy != null and topHierarchy != ''">`top_hierarchy` = #{topHierarchy}</if>
+				<if test="status != null">`status` = #{status}</if>
+				<if test="mobilePhoneNoVerified != null">`mobile_phone_no_verified` = #{mobilePhoneNoVerified}</if>
+				<if test="emailVerified != null">`email_verified` = #{emailVerified}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectByIds" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from user_things
+		where `id`
+		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
+			#{item}
+		</foreach>
+  </select>
+  <update id="batchUpdate">
+    <foreach collection="list" item="item" separator=",">
+			update user_things
+			set
+			<trim suffixOverrides=",">
+				<if test="collection[0].name != null">`name` = #{item.name},</if>
+				<if test="collection[0].nickName != null">`nick_name` = #{item.nickName},</if>
+				<if test="collection[0].mobilePhoneNo != null">`mobile_phone_no` = #{item.mobilePhoneNo},</if>
+				<if test="collection[0].email != null">`email` = #{item.email},</if>
+				<if test="collection[0].password != null">`password` = #{item.password},</if>
+				<if test="collection[0].salt != null">`salt` = #{item.salt},</if>
+				<if test="collection[0].avatarUrl != null">`avatar_url` = #{item.avatarUrl},</if>
+				<if test="collection[0].hierarchyId != null">`hierarchy_id` = #{item.hierarchyId},</if>
+				<if test="collection[0].topHierarchy != null">`top_hierarchy` = #{item.topHierarchy},</if>
+				<if test="collection[0].status != null">`status` = #{item.status},</if>
+				<if test="collection[0].mobilePhoneNoVerified != null">`mobile_phone_no_verified` = #{item.mobilePhoneNoVerified},</if>
+				<if test="collection[0].emailVerified != null">`email_verified` = #{item.emailVerified},</if>
+				<if test="collection[0].createBy != null">`create_by` = #{item.createBy},</if>
+				<if test="collection[0].updateBy != null">`update_by` = #{item.updateBy},</if>
+				<if test="collection[0].createAt != null">`create_at` = #{item.createAt},</if>
+				<if test="collection[0].updateAt != null">`update_at` = #{item.updateAt},</if>
+				<if test="collection[0].detail != null">`detail` = #{item.detail},</if>
+			</trim>
+			where `id` = #{item.id}
+		</foreach>
+  </update>
+</mapper>
