@@ -15,5 +15,5 @@ public interface RoleService {
 
     Boolean removeRole(String roleId);
 
-    Page<RoleResponse> pagingQueryRole(RoleQueryRequest roleQueryRequest);
+    Page<RoleResponse> pagingQueryRoles(RoleQueryRequest roleQueryRequest);
 }

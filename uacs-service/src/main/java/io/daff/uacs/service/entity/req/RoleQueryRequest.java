@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 @Data
 public class RoleQueryRequest extends QueryRequest {
 
-    private String id;
     private String name;
 
     @Override

@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author daff
@@ -68,14 +69,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<RoleResponse> pagingQueryRole(RoleQueryRequest roleQueryRequest) {
+    public Page<RoleResponse> pagingQueryRoles(RoleQueryRequest roleQueryRequest) {
         PageUtil.startPage(roleQueryRequest, RoleResponse.class);
         List<Role> roles = roleMapper.select(
-                Role.builder().id(roleQueryRequest.getId())
-                        .name(roleQueryRequest.getName()).build()
+                Role.builder().name(roleQueryRequest.getName()).build()
         );
         PageInfo<Role> rolePageInfo = new PageInfo<>(roles);
-        List<RoleResponse> roleResponses = CopyUtil.copyList(rolePageInfo.getList(), RoleResponse.class);
+        List<RoleResponse> roleResponses = roles.stream().map(RoleResponse::of).collect(Collectors.toList());
         return Page.of(rolePageInfo.getTotal(), roleResponses);
     }
 }

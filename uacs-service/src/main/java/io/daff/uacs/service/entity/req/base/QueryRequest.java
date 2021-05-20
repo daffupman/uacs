@@ -23,7 +23,7 @@ public abstract class QueryRequest implements Request {
     @ApiModelProperty("每页条数")
     @DecimalMin(value = "1", message = "每页条数最小为1，请重新输入")
     @DecimalMax(value = "1000", message = "每页条数最大为1000，请重新输入")
-    private Integer pageSize = 1000;
+    private Integer pageSize = 10;
 
     /**
      * 对String类型的字段做escape和trim操作
