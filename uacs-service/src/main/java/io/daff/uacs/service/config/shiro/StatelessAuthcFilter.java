@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
 
+    private static final String BEARER_PREFIX = "Bearer ";
+
     /**
      * 从header尝试获取token，如果获取到则去登录
      *
@@ -36,7 +38,7 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         HttpServletRequest req = (HttpServletRequest) request;
-        String accessToken = req.getHeader(SystemConstants.ACCESS_TOKEN);
+        String accessToken = req.getHeader(SystemConstants.AUTHORIZATION);
         if (StringUtils.isEmpty(accessToken)) {
             log.error("使用token登录失败，header缺少access_token参数");
             Response<Void> error = Response.error(Hint.PARAM_MISS_ERROR, "缺失访问令牌");
@@ -45,6 +47,13 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
         }
 
         // 尝试解析accessToken，如果解析失败，代表是一个错误的token
+        if (!accessToken.startsWith(BEARER_PREFIX)) {
+            log.error("非法的访问令牌");
+            Response<Void> error = Response.error(Hint.PARAM_VALIDATE_ERROR, "非法的访问令牌");
+            ResponseUtil.printJsonError(response, error);
+            return false;
+        }
+        accessToken = accessToken.substring(BEARER_PREFIX.length());
         try {
             JwtUtil.getSubjectId(accessToken);
         } catch (Exception e) {
