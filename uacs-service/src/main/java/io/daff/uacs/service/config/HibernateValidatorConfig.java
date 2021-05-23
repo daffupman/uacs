@@ -12,7 +12,7 @@ import javax.validation.ValidatorFactory;
 /**
  * Hibernate校验器配置
  *
- * @author daffupman
+ * @author daff
  * @since 2020/8/22
  */
 @Configuration

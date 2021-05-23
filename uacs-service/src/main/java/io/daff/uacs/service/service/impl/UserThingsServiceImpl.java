@@ -17,7 +17,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +48,7 @@ public class UserThingsServiceImpl implements UserThingsService {
 
         if (!StringUtils.isEmpty(userThingsRequest.getId())) {
             // 修改
-            effectRows = userThingsMapper.batchUpdate(Collections.singletonList(putUserThings));
+            effectRows = userThingsMapper.update(putUserThings);
         } else {
             // 新增
             putUserThings.setId(idUtil.nextId());
@@ -65,7 +64,7 @@ public class UserThingsServiceImpl implements UserThingsService {
             putUserThings.setTopHierarchy(currUserTopHierarchyId);
 
             putUserThings.setCreateBy(currUserId);
-            effectRows = userThingsMapper.batchInsert(Collections.singletonList(putUserThings));
+            effectRows = userThingsMapper.insert(putUserThings);
         }
         return effectRows > 0 ? putUserThings.getId() : null;
     }
@@ -88,12 +87,12 @@ public class UserThingsServiceImpl implements UserThingsService {
     @Override
     public boolean removeUserThings(Long userId) {
 
-        List<UserThings> userThings = userThingsMapper.selectByIds(Collections.singletonList(userId));
+        List<UserThings> userThings = userThingsMapper.selectById(userId);
         if (CollectionUtils.isEmpty(userThings)) {
             return false;
         }
 
-        int effectRows = userThingsMapper.deleteByIds(Collections.singletonList(userId));
+        int effectRows = userThingsMapper.deleteById(userId);
         return effectRows > 0;
     }
 }

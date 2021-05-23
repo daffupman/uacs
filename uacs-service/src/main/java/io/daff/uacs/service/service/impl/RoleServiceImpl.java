@@ -9,7 +9,6 @@ import io.daff.uacs.service.entity.resp.base.Page;
 import io.daff.uacs.service.mapper.RoleMapper;
 import io.daff.uacs.service.service.RoleService;
 import io.daff.uacs.service.util.PageUtil;
-import io.daff.util.CopyUtil;
 import io.daff.util.StringHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -46,12 +45,12 @@ public class RoleServiceImpl implements RoleService {
         if (!StringUtils.isEmpty(roleRequest.getId())) {
             // 修改角色
             putRole.setUpdateBy(currUserId);
-            effectRows = roleMapper.batchUpdate(Collections.singletonList(putRole));
+            effectRows = roleMapper.update(putRole);
         } else {
             // 新增角色
             putRole.setId(StringHelper.uuid());
             putRole.setCreateBy(currUserId);
-            effectRows = roleMapper.batchInsert(Collections.singletonList(putRole));
+            effectRows = roleMapper.insert(putRole);
         }
         return effectRows > 0 ? putRole.getId() : null;
     }
@@ -59,12 +58,12 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean removeRole(String roleId) {
 
-        List<Role> roles = roleMapper.selectByIds(Collections.singletonList(roleId));
+        List<Role> roles = roleMapper.selectById(roleId);
         if (CollectionUtils.isEmpty(roles)) {
             return false;
         }
 
-        int effectRows = roleMapper.deleteByIds(Collections.singletonList(roleId));
+        int effectRows = roleMapper.deleteById(roleId);
         return effectRows > 0;
     }
 

@@ -20,6 +20,7 @@
     <module>uacs-core</module>
     <module>uacs-service</module>
     <module>uacs-cms</module>
+    <module>uacs-web</module>
   </modules>
 
   <properties>
