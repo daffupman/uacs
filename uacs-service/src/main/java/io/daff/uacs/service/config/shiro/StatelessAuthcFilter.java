@@ -38,6 +38,9 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         HttpServletRequest req = (HttpServletRequest) request;
+        if (req.getMethod().equalsIgnoreCase("OPTIONS")) {
+            return true;
+        }
         String accessToken = req.getHeader(SystemConstants.AUTHORIZATION);
         if (StringUtils.isEmpty(accessToken)) {
             log.error("使用token登录失败，header缺少access_token参数");
@@ -64,8 +67,8 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
         }
 
         if (JwtUtil.isExpired(accessToken)) {
-            log.error("token已过期");
-            Response<Void> error = Response.error(Hint.AUTHENTICATION_FAILED, "非法的访问令牌");
+            log.error("访问令牌已过期");
+            Response<Void> error = Response.error(Hint.AUTHENTICATION_FAILED, "过期的访问令牌");
             ResponseUtil.printJsonError(response, error);
             return false;
         }

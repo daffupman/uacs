@@ -18,6 +18,7 @@ public class RoleResponse {
 
     private String id;
     private String name;
+    private String desc;
     private String type;
     private String createBy;
 
@@ -25,6 +26,7 @@ public class RoleResponse {
         return RoleResponse.builder()
                 .id(role.getId())
                 .name(role.getName())
+                .desc(role.getDesc())
                 .type(role.getType() == 0 ? "管理员" : "普通角色")
                 .build();
     }

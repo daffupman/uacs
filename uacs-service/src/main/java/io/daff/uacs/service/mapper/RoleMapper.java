@@ -21,7 +21,7 @@ public interface RoleMapper {
 
     Role selectOne(Role record);
 
-    List<Role> selectById(String id);
+    Role selectById(String id);
 
     List<Role> selectByIds(List<String> ids);
 
@@ -30,4 +30,6 @@ public interface RoleMapper {
     List<Role> selectByUserId(Long userId);
 
     List<String> selectRolesByUserId(Long curUserSsoId);
+
+    List<Role> selectByName(String name);
 }

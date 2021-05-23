@@ -18,6 +18,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Service;
@@ -86,7 +87,7 @@ public class PassportServiceImpl implements PassportService {
         } catch (IncorrectCredentialsException e) {
             log.error("认证登录失败", e);
             throw new BaseException(Hint.AUTHENTICATION_FAILED, "帐户和密码不一致");
-        } catch (ExcessiveAttemptsException e) {
+        } catch (ExcessiveAttemptsException | UnknownAccountException e) {
             log.error("认证登录失败", e);
             throw new BaseException(Hint.AUTHENTICATION_FAILED, e.getMessage());
         } catch (AuthenticationException e) {
@@ -99,6 +100,6 @@ public class PassportServiceImpl implements PassportService {
         UserThings userThings = baseService.matchAccount(account);
         String accessToken = OAuthTokenUtil.generateAccessToken(GrantTypeEnum.PASSWORD, userThings.getId().toString(), userThings.getPassword(), appId, appSecret);
         String refreshToken = OAuthTokenUtil.generateRefreshToken(GrantTypeEnum.PASSWORD, userThings.getId().toString(), userThings.getPassword(), appId, appSecret);
-        return new OAuthResponse(accessToken, refreshToken);
+        return new OAuthResponse(userThings.getId(), userThings.getName(), userThings.getNickName(), accessToken, refreshToken);
     }
 }

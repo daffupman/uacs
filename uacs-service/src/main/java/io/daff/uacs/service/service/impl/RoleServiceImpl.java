@@ -2,20 +2,20 @@ package io.daff.uacs.service.service.impl;
 
 import com.github.pagehelper.PageInfo;
 import io.daff.uacs.service.entity.po.Role;
-import io.daff.uacs.service.entity.req.RoleQueryRequest;
 import io.daff.uacs.service.entity.req.RoleRequest;
+import io.daff.uacs.service.entity.req.RoleSortableQueryRequest;
 import io.daff.uacs.service.entity.resp.RoleResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
 import io.daff.uacs.service.mapper.RoleMapper;
 import io.daff.uacs.service.service.RoleService;
 import io.daff.uacs.service.util.PageUtil;
+import io.daff.util.CopyUtil;
 import io.daff.util.StringHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,8 +58,8 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean removeRole(String roleId) {
 
-        List<Role> roles = roleMapper.selectById(roleId);
-        if (CollectionUtils.isEmpty(roles)) {
+        Role role = roleMapper.selectById(roleId);
+        if (role != null) {
             return false;
         }
 
@@ -68,13 +68,17 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<RoleResponse> pagingQueryRoles(RoleQueryRequest roleQueryRequest) {
-        PageUtil.startPage(roleQueryRequest, RoleResponse.class);
-        List<Role> roles = roleMapper.select(
-                Role.builder().name(roleQueryRequest.getName()).build()
-        );
+    public Page<RoleResponse> pagingQueryRoles(RoleSortableQueryRequest roleSortableQueryRequest) {
+        PageUtil.startPage(roleSortableQueryRequest, RoleResponse.class);
+        List<Role> roles = roleMapper.selectByName(roleSortableQueryRequest.getName());
         PageInfo<Role> rolePageInfo = new PageInfo<>(roles);
         List<RoleResponse> roleResponses = roles.stream().map(RoleResponse::of).collect(Collectors.toList());
         return Page.of(rolePageInfo.getTotal(), roleResponses);
+    }
+
+    @Override
+    public RoleResponse roleDetail(String roleId) {
+        Role role = roleMapper.selectById(roleId);
+        return RoleResponse.of(role);
     }
 }

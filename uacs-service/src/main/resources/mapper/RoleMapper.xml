@@ -178,4 +178,13 @@
 		WHERE urm.user_id = #{userId}
 	</select>
 	<select id="selectRolesByUserId" resultType="java.lang.String"></select>
+  <select id="selectByName" resultMap="BaseResultMap">
+		select <include refid="baseSelectFields"/>
+		from role
+		<where>
+			<if test="name != null and name != ''">
+				name like concat('%', #{name}, '%')
+			</if>
+		</where>
+	</select>
 </mapper>

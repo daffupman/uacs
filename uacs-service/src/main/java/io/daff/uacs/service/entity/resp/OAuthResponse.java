@@ -11,6 +11,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class OAuthResponse {
 
+    private Long id;
+    private String name;
+    private String nickName;
     private String accessToken;
     private String refreshToken;
 }

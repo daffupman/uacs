@@ -1,7 +1,7 @@
 package io.daff.uacs.service.controller;
 
 import io.daff.entity.Response;
-import io.daff.uacs.service.entity.req.RoleQueryRequest;
+import io.daff.uacs.service.entity.req.RoleSortableQueryRequest;
 import io.daff.uacs.service.entity.req.RoleRequest;
 import io.daff.uacs.service.entity.resp.RoleResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
@@ -37,9 +37,9 @@ public class RoleController {
 
     @GetMapping
     public Response<Page<RoleResponse>> pagingQueryRoles(@NotNull(message = "请求参数为空")
-                                                         @Validated RoleQueryRequest roleQueryRequest) {
+                                                         @Validated RoleSortableQueryRequest roleSortableQueryRequest) {
 
-        Page<RoleResponse> roleResponsePage = roleService.pagingQueryRoles(roleQueryRequest);
+        Page<RoleResponse> roleResponsePage = roleService.pagingQueryRoles(roleSortableQueryRequest);
         return Response.ok(roleResponsePage);
     }
 
@@ -47,5 +47,11 @@ public class RoleController {
     public Response<Void> removeRoles(@PathVariable("roleId") String roleId) {
         roleService.removeRole(roleId);
         return Response.ok();
+    }
+
+    @GetMapping("/{roleId}")
+    public Response<RoleResponse> roleDetail(@PathVariable("roleId") String roleId) {
+        RoleResponse roleResponse = roleService.roleDetail(roleId);
+        return Response.ok(roleResponse);
     }
 }
