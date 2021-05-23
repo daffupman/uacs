@@ -1,6 +1,6 @@
 package io.daff.uacs.service.entity.req;
 
-import io.daff.uacs.service.entity.req.base.QueryRequest;
+import io.daff.uacs.service.entity.req.base.SortableQueryRequest;
 import lombok.Data;
 import org.springframework.util.StringUtils;
 
@@ -9,9 +9,8 @@ import org.springframework.util.StringUtils;
  * @since 2021/5/17
  */
 @Data
-public class RoleQueryRequest extends QueryRequest {
+public class RoleSortableQueryRequest extends SortableQueryRequest {
 
-    private String id;
     private String name;
 
     @Override

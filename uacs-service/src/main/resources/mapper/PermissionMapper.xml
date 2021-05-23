@@ -16,6 +16,35 @@
   <sql id="baseSelectFields">
     `id`, `code`, `desc`, `type`, `state`, `create_by`, `update_by`, `create_at`, `update_at`, `detail`
   </sql>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into permission(
+	  <trim suffixOverrides=",">
+			<if test="id != null">`id`,</if>
+			<if test="code != null">`code`,</if>
+			<if test="desc != null">`desc`,</if>
+			<if test="type != null">`type`,</if>
+			<if test="state != null">`state`,</if>
+			<if test="createBy != null">`create_by`,</if>
+			<if test="updateBy != null">`update_by`,</if>
+			<if test="createAt != null">`create_at`,</if>
+			<if test="updateAt != null">`update_at`,</if>
+			<if test="detail != null">`detail`,</if>
+	  </trim>
+		) values (
+		<trim suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="code != null">#{code},</if>
+			<if test="desc != null">#{desc},</if>
+			<if test="type != null">#{type},</if>
+			<if test="state != null">#{state},</if>
+			<if test="createBy != null">#{createBy},</if>
+			<if test="updateBy != null">#{updateBy},</if>
+			<if test="createAt != null">#{createAt},</if>
+			<if test="updateAt != null">#{updateAt},</if>
+			<if test="detail != null">#{detail},</if>
+		</trim>
+		)
+  </insert>
   <insert id="batchInsert" keyProperty="id" useGeneratedKeys="true">
     insert into permission(
 	  <trim suffixOverrides=",">
@@ -30,8 +59,7 @@
 			<if test="collection[0].updateAt != null">`update_at`,</if>
 			<if test="collection[0].detail != null">`detail`,</if>
 	  </trim>
-		)
-		values
+		) values
 		<foreach collection="list" item="item" separator=",">
 		(
 		<trim suffixOverrides=",">
@@ -49,6 +77,10 @@
 		)
 		</foreach>
   </insert>
+  <delete id="deleteById">
+    delete from permission
+	  where `id` = #{id}
+  </delete>
   <delete id="deleteByIds">
     delete from permission
 	  where `id`
@@ -56,30 +88,22 @@
 		#{item}
 	  </foreach>
   </delete>
-  <select id="select" resultMap="BaseResultMap">
-    select <include refid="baseSelectFields"/>
-	  from permission
-	  <where>
-	    <trim suffixOverrides=",">
-				<if test="code != null and code != ''">`code` = #{code}</if>
-				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
-				<if test="type != null">`type` = #{type}</if>
-				<if test="state != null">`state` = #{state}</if>
-				<if test="createBy != null">`create_by` = #{createBy}</if>
-				<if test="updateBy != null">`update_by` = #{updateBy}</if>
-				<if test="createAt != null">`create_at` = #{createAt}</if>
-				<if test="updateAt != null">`update_at` = #{updateAt}</if>
-	    </trim>
-	  </where>
-  </select>
-  <select id="selectByIds" resultMap="BaseResultMap">
-    select	<include refid="baseSelectFields"/>
-		from permission
-		where `id`
-		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
-			#{item}
-		</foreach>
-  </select>
+  <update id="update">
+    update permission
+		set
+		<trim suffixOverrides=",">
+			<if test="code != null">`code` = #{code},</if>
+			<if test="desc != null">`desc` = #{desc},</if>
+			<if test="type != null">`type` = #{type},</if>
+			<if test="state != null">`state` = #{state},</if>
+			<if test="createBy != null">`create_by` = #{createBy},</if>
+			<if test="updateBy != null">`update_by` = #{updateBy},</if>
+			<if test="createAt != null">`create_at` = #{createAt},</if>
+			<if test="updateAt != null">`update_at` = #{updateAt},</if>
+			<if test="detail != null">`detail` = #{detail},</if>
+		</trim>
+		where `id` = #{id}
+  </update>
   <update id="batchUpdate">
     <foreach collection="list" item="item" separator=",">
 			update permission
@@ -94,8 +118,75 @@
 				<if test="collection[0].createAt != null">`create_at` = #{item.createAt},</if>
 				<if test="collection[0].updateAt != null">`update_at` = #{item.updateAt},</if>
 				<if test="collection[0].detail != null">`detail` = #{item.detail},</if>
+				<if test="collection[0].detail != null">`detail` = #{item.detail},</if>
 			</trim>
 			where `id` = #{item.id}
 		</foreach>
   </update>
+  <select id="select" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from permission
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="code != null and code != ''">`code` = #{code}</if>
+				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
+				<if test="type != null">`type` = #{type}</if>
+				<if test="state != null">`state` = #{state}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectOne" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from permission
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="code != null and code != ''">`code` = #{code}</if>
+				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
+				<if test="type != null">`type` = #{type}</if>
+				<if test="state != null">`state` = #{state}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectById" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from permission
+		where `id` = #{id}
+  </select>
+  <select id="selectByIds" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from permission
+		where `id`
+		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
+			#{item}
+		</foreach>
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from permission
+  </select>
+  <select id="selectByRoleIds" resultType="io.daff.uacs.service.entity.po.Permission">
+		SELECT p.id, p.code, p.desc
+		FROM permission p
+		LEFT JOIN role_permission_mapping rpm on p.id = rpm.permission_id
+		WHERE rpm.role_id IN
+		<foreach collection="roleIdList" item="roleId" open="(" close=")" separator=",">
+			#{roleId}
+		</foreach>
+	</select>
 </mapper>

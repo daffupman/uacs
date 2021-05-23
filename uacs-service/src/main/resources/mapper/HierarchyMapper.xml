@@ -18,6 +18,39 @@
   <sql id="baseSelectFields">
     `id`, `name`, `desc`, `seq`, `parent_id`, `deleted`, `domain_id`, `create_at`, `update_at`, `create_by`, `update_by`, `detail`
   </sql>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into hierarchy(
+	  <trim suffixOverrides=",">
+			<if test="id != null">`id`,</if>
+			<if test="name != null">`name`,</if>
+			<if test="desc != null">`desc`,</if>
+			<if test="seq != null">`seq`,</if>
+			<if test="parentId != null">`parent_id`,</if>
+			<if test="deleted != null">`deleted`,</if>
+			<if test="domainId != null">`domain_id`,</if>
+			<if test="createAt != null">`create_at`,</if>
+			<if test="updateAt != null">`update_at`,</if>
+			<if test="createBy != null">`create_by`,</if>
+			<if test="updateBy != null">`update_by`,</if>
+			<if test="detail != null">`detail`,</if>
+	  </trim>
+		) values (
+		<trim suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="name != null">#{name},</if>
+			<if test="desc != null">#{desc},</if>
+			<if test="seq != null">#{seq},</if>
+			<if test="parentId != null">#{parentId},</if>
+			<if test="deleted != null">#{deleted},</if>
+			<if test="domainId != null">#{domainId},</if>
+			<if test="createAt != null">#{createAt},</if>
+			<if test="updateAt != null">#{updateAt},</if>
+			<if test="createBy != null">#{createBy},</if>
+			<if test="updateBy != null">#{updateBy},</if>
+			<if test="detail != null">#{detail},</if>
+		</trim>
+		)
+  </insert>
   <insert id="batchInsert" keyProperty="id" useGeneratedKeys="true">
     insert into hierarchy(
 	  <trim suffixOverrides=",">
@@ -34,8 +67,7 @@
 			<if test="collection[0].updateBy != null">`update_by`,</if>
 			<if test="collection[0].detail != null">`detail`,</if>
 	  </trim>
-		)
-		values
+		) values
 		<foreach collection="list" item="item" separator=",">
 		(
 		<trim suffixOverrides=",">
@@ -55,6 +87,10 @@
 		)
 		</foreach>
   </insert>
+  <delete id="deleteById">
+    delete from hierarchy
+	  where `id` = #{id}
+  </delete>
   <delete id="deleteByIds">
     delete from hierarchy
 	  where `id`
@@ -62,32 +98,24 @@
 		#{item}
 	  </foreach>
   </delete>
-  <select id="select" resultMap="BaseResultMap">
-    select <include refid="baseSelectFields"/>
-	  from hierarchy
-	  <where>
-	    <trim suffixOverrides=",">
-				<if test="name != null and name != ''">`name` = #{name}</if>
-				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
-				<if test="seq != null">`seq` = #{seq}</if>
-				<if test="parentId != null">`parent_id` = #{parentId}</if>
-				<if test="deleted != null">`deleted` = #{deleted}</if>
-				<if test="domainId != null and domainId != ''">`domain_id` = #{domainId}</if>
-				<if test="createAt != null">`create_at` = #{createAt}</if>
-				<if test="updateAt != null">`update_at` = #{updateAt}</if>
-				<if test="createBy != null">`create_by` = #{createBy}</if>
-				<if test="updateBy != null">`update_by` = #{updateBy}</if>
-	    </trim>
-	  </where>
-  </select>
-  <select id="selectByIds" resultMap="BaseResultMap">
-    select	<include refid="baseSelectFields"/>
-		from hierarchy
-		where `id`
-		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
-			#{item}
-		</foreach>
-  </select>
+  <update id="update">
+    update hierarchy
+		set
+		<trim suffixOverrides=",">
+			<if test="name != null">`name` = #{name},</if>
+			<if test="desc != null">`desc` = #{desc},</if>
+			<if test="seq != null">`seq` = #{seq},</if>
+			<if test="parentId != null">`parent_id` = #{parentId},</if>
+			<if test="deleted != null">`deleted` = #{deleted},</if>
+			<if test="domainId != null">`domain_id` = #{domainId},</if>
+			<if test="createAt != null">`create_at` = #{createAt},</if>
+			<if test="updateAt != null">`update_at` = #{updateAt},</if>
+			<if test="createBy != null">`create_by` = #{createBy},</if>
+			<if test="updateBy != null">`update_by` = #{updateBy},</if>
+			<if test="detail != null">`detail` = #{detail},</if>
+		</trim>
+		where `id` = #{id}
+  </update>
   <update id="batchUpdate">
     <foreach collection="list" item="item" separator=",">
 			update hierarchy
@@ -108,4 +136,83 @@
 			where `id` = #{item.id}
 		</foreach>
   </update>
+  <select id="select" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from hierarchy
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="name != null and name != ''">`name` = #{name}</if>
+				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
+				<if test="seq != null">`seq` = #{seq}</if>
+				<if test="parentId != null">`parent_id` = #{parentId}</if>
+				<if test="deleted != null">`deleted` = #{deleted}</if>
+				<if test="domainId != null and domainId != ''">`domain_id` = #{domainId}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectOne" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from hierarchy
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="name != null and name != ''">`name` = #{name}</if>
+				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
+				<if test="seq != null">`seq` = #{seq}</if>
+				<if test="parentId != null">`parent_id` = #{parentId}</if>
+				<if test="deleted != null">`deleted` = #{deleted}</if>
+				<if test="domainId != null and domainId != ''">`domain_id` = #{domainId}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectById" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from hierarchy
+		where `id` = #{id}
+  </select>
+  <select id="selectByIds" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from hierarchy
+		where `id`
+		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
+			#{item}
+		</foreach>
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from hierarchy
+  </select>
+	<select id="selectHierarchyListByParentId" resultType="java.lang.Integer">
+		WITH RECURSIVE r_h AS (
+			SELECT id FROM hierarchy WHERE id = #{orgHierarchyId}
+			UNION ALL
+			SELECT h.id FROM hierarchy h JOIN r_h ph ON h.parent_id = ph.id
+		)
+		SELECT * FROM r_h
+	</select>
+	<select id="listByIdentity" resultType="java.lang.Integer">
+		SELECT id FROM hierarchy
+		<where>
+			<if test="hierarchyIdList != null and hierarchyIdList.size > 0">
+				<foreach collection="hierarchyIdList" item="hierarchyId" open="id IN (" close=")" separator=",">
+					#{hierarchyId}
+				</foreach>
+			</if>
+		</where>
+	</select>
 </mapper>

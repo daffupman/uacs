@@ -2,8 +2,8 @@ package io.daff.uacs.service.service.impl;
 
 import com.github.pagehelper.PageInfo;
 import io.daff.uacs.service.entity.po.Role;
-import io.daff.uacs.service.entity.req.RoleQueryRequest;
 import io.daff.uacs.service.entity.req.RoleRequest;
+import io.daff.uacs.service.entity.req.RoleSortableQueryRequest;
 import io.daff.uacs.service.entity.resp.RoleResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
 import io.daff.uacs.service.mapper.RoleMapper;
@@ -16,8 +16,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author daff
@@ -45,12 +45,12 @@ public class RoleServiceImpl implements RoleService {
         if (!StringUtils.isEmpty(roleRequest.getId())) {
             // 修改角色
             putRole.setUpdateBy(currUserId);
-            effectRows = roleMapper.batchUpdate(Collections.singletonList(putRole));
+            effectRows = roleMapper.update(putRole);
         } else {
             // 新增角色
             putRole.setId(StringHelper.uuid());
             putRole.setCreateBy(currUserId);
-            effectRows = roleMapper.batchInsert(Collections.singletonList(putRole));
+            effectRows = roleMapper.insert(putRole);
         }
         return effectRows > 0 ? putRole.getId() : null;
     }
@@ -58,24 +58,27 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean removeRole(String roleId) {
 
-        List<Role> roles = roleMapper.selectByIds(Collections.singletonList(roleId));
-        if (CollectionUtils.isEmpty(roles)) {
+        Role role = roleMapper.selectById(roleId);
+        if (role != null) {
             return false;
         }
 
-        int effectRows = roleMapper.deleteByIds(Collections.singletonList(roleId));
+        int effectRows = roleMapper.deleteById(roleId);
         return effectRows > 0;
     }
 
     @Override
-    public Page<RoleResponse> pagingQueryRole(RoleQueryRequest roleQueryRequest) {
-        PageUtil.startPage(roleQueryRequest, RoleResponse.class);
-        List<Role> roles = roleMapper.select(
-                Role.builder().id(roleQueryRequest.getId())
-                        .name(roleQueryRequest.getName()).build()
-        );
+    public Page<RoleResponse> pagingQueryRoles(RoleSortableQueryRequest roleSortableQueryRequest) {
+        PageUtil.startPage(roleSortableQueryRequest, RoleResponse.class);
+        List<Role> roles = roleMapper.selectByName(roleSortableQueryRequest.getName());
         PageInfo<Role> rolePageInfo = new PageInfo<>(roles);
-        List<RoleResponse> roleResponses = CopyUtil.copyList(rolePageInfo.getList(), RoleResponse.class);
+        List<RoleResponse> roleResponses = roles.stream().map(RoleResponse::of).collect(Collectors.toList());
         return Page.of(rolePageInfo.getTotal(), roleResponses);
+    }
+
+    @Override
+    public RoleResponse roleDetail(String roleId) {
+        Role role = roleMapper.selectById(roleId);
+        return RoleResponse.of(role);
     }
 }

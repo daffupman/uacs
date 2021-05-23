@@ -20,6 +20,7 @@
     <module>uacs-core</module>
     <module>uacs-service</module>
     <module>uacs-cms</module>
+    <module>uacs-web</module>
   </modules>
 
   <properties>
@@ -39,6 +40,10 @@
           <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency> <!-- 引入log4j2依赖 -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-log4j2</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

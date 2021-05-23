@@ -9,3 +9,9 @@ server:
     context-path: /uacs
 mybatis:
   mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    use-generated-keys: true
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  config: classpath:log4j2.xml

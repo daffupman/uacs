@@ -15,6 +15,33 @@
   <sql id="baseSelectFields">
     `id`, `name`, `desc`, `type`, `create_by`, `update_by`, `create_at`, `update_at`, `detail`
   </sql>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into role(
+	  <trim suffixOverrides=",">
+			<if test="id != null">`id`,</if>
+			<if test="name != null">`name`,</if>
+			<if test="desc != null">`desc`,</if>
+			<if test="type != null">`type`,</if>
+			<if test="createBy != null">`create_by`,</if>
+			<if test="updateBy != null">`update_by`,</if>
+			<if test="createAt != null">`create_at`,</if>
+			<if test="updateAt != null">`update_at`,</if>
+			<if test="detail != null">`detail`,</if>
+	  </trim>
+		) values (
+		<trim suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="name != null">#{name},</if>
+			<if test="desc != null">#{desc},</if>
+			<if test="type != null">#{type},</if>
+			<if test="createBy != null">#{createBy},</if>
+			<if test="updateBy != null">#{updateBy},</if>
+			<if test="createAt != null">#{createAt},</if>
+			<if test="updateAt != null">#{updateAt},</if>
+			<if test="detail != null">#{detail},</if>
+		</trim>
+		)
+  </insert>
   <insert id="batchInsert" keyProperty="id" useGeneratedKeys="true">
     insert into role(
 	  <trim suffixOverrides=",">
@@ -28,8 +55,7 @@
 			<if test="collection[0].updateAt != null">`update_at`,</if>
 			<if test="collection[0].detail != null">`detail`,</if>
 	  </trim>
-		)
-		values
+		) values
 		<foreach collection="list" item="item" separator=",">
 		(
 		<trim suffixOverrides=",">
@@ -46,6 +72,10 @@
 		)
 		</foreach>
   </insert>
+  <delete id="deleteById">
+    delete from role
+	  where `id` = #{id}
+  </delete>
   <delete id="deleteByIds">
     delete from role
 	  where `id`
@@ -53,29 +83,21 @@
 		#{item}
 	  </foreach>
   </delete>
-  <select id="select" resultMap="BaseResultMap">
-    select <include refid="baseSelectFields"/>
-	  from role
-	  <where>
-	    <trim suffixOverrides=",">
-				<if test="name != null and name != ''">`name` = #{name}</if>
-				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
-				<if test="type != null">`type` = #{type}</if>
-				<if test="createBy != null">`create_by` = #{createBy}</if>
-				<if test="updateBy != null">`update_by` = #{updateBy}</if>
-				<if test="createAt != null">`create_at` = #{createAt}</if>
-				<if test="updateAt != null">`update_at` = #{updateAt}</if>
-	    </trim>
-	  </where>
-  </select>
-  <select id="selectByIds" resultMap="BaseResultMap">
-    select	<include refid="baseSelectFields"/>
-		from role
-		where `id`
-		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
-			#{item}
-		</foreach>
-  </select>
+  <update id="update">
+    update role
+		set
+		<trim suffixOverrides=",">
+			<if test="name != null">`name` = #{name},</if>
+			<if test="desc != null">`desc` = #{desc},</if>
+			<if test="type != null">`type` = #{type},</if>
+			<if test="createBy != null">`create_by` = #{createBy},</if>
+			<if test="updateBy != null">`update_by` = #{updateBy},</if>
+			<if test="createAt != null">`create_at` = #{createAt},</if>
+			<if test="updateAt != null">`update_at` = #{updateAt},</if>
+			<if test="detail != null">`detail` = #{detail},</if>
+		</trim>
+		where `id` = #{id}
+  </update>
   <update id="batchUpdate">
     <foreach collection="list" item="item" separator=",">
 			update role
@@ -89,8 +111,80 @@
 				<if test="collection[0].createAt != null">`create_at` = #{item.createAt},</if>
 				<if test="collection[0].updateAt != null">`update_at` = #{item.updateAt},</if>
 				<if test="collection[0].detail != null">`detail` = #{item.detail},</if>
+				<if test="collection[0].detail != null">`detail` = #{item.detail},</if>
 			</trim>
 			where `id` = #{item.id}
 		</foreach>
   </update>
+  <select id="select" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from role
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="name != null and name != ''">`name` = #{name}</if>
+				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
+				<if test="type != null">`type` = #{type}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectOne" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from role
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="name != null and name != ''">`name` = #{name}</if>
+				<if test="desc != null and desc != ''">`desc` = #{desc}</if>
+				<if test="type != null">`type` = #{type}</if>
+				<if test="createBy != null">`create_by` = #{createBy}</if>
+				<if test="updateBy != null">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+				<if test="detail != null and detail != ''">`detail` = #{detail}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectById" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from role
+		where `id` = #{id}
+  </select>
+  <select id="selectByIds" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from role
+		where `id`
+		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
+			#{item}
+		</foreach>
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from role
+  </select>
+  <select id="selectByUserId" resultType="io.daff.uacs.service.entity.po.Role">
+		SELECT r.id, r.name, r.create_by, r.update_by, r.create_at, r.update_at
+		FROM role r
+		LEFT JOIN user_role_mapping urm on r.id = urm.role_id
+		WHERE urm.user_id = #{userId}
+	</select>
+	<select id="selectRolesByUserId" resultType="java.lang.String"></select>
+  <select id="selectByName" resultMap="BaseResultMap">
+		select <include refid="baseSelectFields"/>
+		from role
+		<where>
+			<if test="name != null and name != ''">
+				name like concat('%', #{name}, '%')
+			</if>
+		</where>
+	</select>
 </mapper>
