@@ -21,7 +21,7 @@ public interface UserThingsMapper {
 
     UserThings selectOne(UserThings record);
 
-    List<UserThings> selectById(Long id);
+    UserThings selectById(Long id);
 
     List<UserThings> selectByIds(List<Long> ids);
 

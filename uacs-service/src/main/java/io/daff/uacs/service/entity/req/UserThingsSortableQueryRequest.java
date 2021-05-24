@@ -1,6 +1,6 @@
 package io.daff.uacs.service.entity.req;
 
-import io.daff.uacs.service.entity.req.base.QueryRequest;
+import io.daff.uacs.service.entity.req.base.SortableQueryRequest;
 import lombok.Data;
 import org.springframework.util.StringUtils;
 
@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
  * @since 2021/5/17
  */
 @Data
-public class UserThingsQueryRequest extends QueryRequest {
+public class UserThingsSortableQueryRequest extends SortableQueryRequest {
 
     private String name;
     private String mobilePhoneNo;

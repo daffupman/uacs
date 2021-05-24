@@ -136,6 +136,7 @@ public class MonitorAspect {
         if (monitor.recordReturnValue()) {
             log.info(String.format("【MONITOR - 出参】调用 %s 的返回：【%s】", name, JacksonUtil.beanToString(returnValue)));
         }
+        IpRequestContext.removeIp();
         return returnValue;
     }
 
