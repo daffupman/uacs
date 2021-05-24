@@ -17,4 +17,8 @@ public class IpRequestContext implements Serializable {
     public static void setIp(String ip) {
         ipThreadLocal.set(ip);
     }
+
+    public static void removeIp() {
+        ipThreadLocal.remove();
+    }
 }

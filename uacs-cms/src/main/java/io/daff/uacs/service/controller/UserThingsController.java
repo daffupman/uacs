@@ -1,8 +1,8 @@
 package io.daff.uacs.service.controller;
 
 import io.daff.entity.Response;
-import io.daff.uacs.service.entity.req.UserThingsQueryRequest;
-import io.daff.uacs.service.entity.req.base.UserThingsRequest;
+import io.daff.uacs.service.entity.req.UserThingsSortableQueryRequest;
+import io.daff.uacs.service.entity.req.UserThingsRequest;
 import io.daff.uacs.service.entity.resp.UserThingsResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
 import io.daff.uacs.service.service.UserThingsService;
@@ -37,9 +37,9 @@ public class UserThingsController {
 
     @GetMapping
     public Response<Page<UserThingsResponse>> pagingQueryUserThings(@NotNull(message = "请求参数为空")
-                                                         @Validated UserThingsQueryRequest userThingsQueryRequest) {
+                                                         @Validated UserThingsSortableQueryRequest userThingsSortableQueryRequest) {
 
-        Page<UserThingsResponse> userThingsResponsePage = userThingsService.pagingQueryUserThings(userThingsQueryRequest);
+        Page<UserThingsResponse> userThingsResponsePage = userThingsService.pagingQueryUserThings(userThingsSortableQueryRequest);
         return Response.ok(userThingsResponsePage);
     }
 
@@ -47,5 +47,11 @@ public class UserThingsController {
     public Response<Void> removeUserThings(@PathVariable("userId") Long userId) {
         userThingsService.removeUserThings(userId);
         return Response.ok();
+    }
+
+    @GetMapping("/{userId}")
+    public Response<UserThingsResponse> userThingsDetail(@PathVariable("userId") Long userId) {
+        UserThingsResponse userThingsResponse = userThingsService.userThingsDetail(userId);
+        return Response.ok(userThingsResponse);
     }
 }

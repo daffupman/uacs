@@ -1,4 +1,4 @@
-package io.daff.uacs.service.entity.req.base;
+package io.daff.uacs.service.entity.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

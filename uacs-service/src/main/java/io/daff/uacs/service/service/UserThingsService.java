@@ -1,7 +1,7 @@
 package io.daff.uacs.service.service;
 
-import io.daff.uacs.service.entity.req.UserThingsQueryRequest;
-import io.daff.uacs.service.entity.req.base.UserThingsRequest;
+import io.daff.uacs.service.entity.req.UserThingsSortableQueryRequest;
+import io.daff.uacs.service.entity.req.UserThingsRequest;
 import io.daff.uacs.service.entity.resp.UserThingsResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
 
@@ -13,7 +13,9 @@ public interface UserThingsService {
 
     Long saveOrUpdateUserThings(UserThingsRequest userThingsRequest);
 
-    Page<UserThingsResponse> pagingQueryUserThings(UserThingsQueryRequest userThingsQueryRequest);
+    Page<UserThingsResponse> pagingQueryUserThings(UserThingsSortableQueryRequest userThingsSortableQueryRequest);
 
     boolean removeUserThings(Long userId);
+
+    UserThingsResponse userThingsDetail(Long userId);
 }

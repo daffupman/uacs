@@ -4,8 +4,8 @@ import com.github.pagehelper.PageInfo;
 import io.daff.consts.SystemConstants;
 import io.daff.uacs.core.util.IdUtil;
 import io.daff.uacs.service.entity.po.UserThings;
-import io.daff.uacs.service.entity.req.UserThingsQueryRequest;
-import io.daff.uacs.service.entity.req.base.UserThingsRequest;
+import io.daff.uacs.service.entity.req.UserThingsSortableQueryRequest;
+import io.daff.uacs.service.entity.req.UserThingsRequest;
 import io.daff.uacs.service.entity.resp.UserThingsResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
 import io.daff.uacs.service.mapper.UserThingsMapper;
@@ -13,7 +13,6 @@ import io.daff.uacs.service.service.UserThingsService;
 import io.daff.uacs.service.util.PageUtil;
 import io.daff.util.StrongCryptoUtil;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -70,13 +69,13 @@ public class UserThingsServiceImpl implements UserThingsService {
     }
 
     @Override
-    public Page<UserThingsResponse> pagingQueryUserThings(UserThingsQueryRequest userThingsQueryRequest) {
-        PageUtil.startPage(userThingsQueryRequest, UserThingsResponse.class);
+    public Page<UserThingsResponse> pagingQueryUserThings(UserThingsSortableQueryRequest userThingsSortableQueryRequest) {
+        PageUtil.startPage(userThingsSortableQueryRequest, UserThingsResponse.class);
         List<UserThings> userThings = userThingsMapper.select(
                 UserThings.builder()
-                        .name(userThingsQueryRequest.getName())
-                        .mobilePhoneNo(userThingsQueryRequest.getMobilePhoneNo())
-                        .email(userThingsQueryRequest.getEmail())
+                        .name(userThingsSortableQueryRequest.getName())
+                        .mobilePhoneNo(userThingsSortableQueryRequest.getMobilePhoneNo())
+                        .email(userThingsSortableQueryRequest.getEmail())
                         .build()
         );
         PageInfo<UserThings> userThingsPageInfo = new PageInfo<>(userThings);
@@ -87,12 +86,18 @@ public class UserThingsServiceImpl implements UserThingsService {
     @Override
     public boolean removeUserThings(Long userId) {
 
-        List<UserThings> userThings = userThingsMapper.selectById(userId);
-        if (CollectionUtils.isEmpty(userThings)) {
+        UserThings userThings = userThingsMapper.selectById(userId);
+        if (userThings == null) {
             return false;
         }
 
         int effectRows = userThingsMapper.deleteById(userId);
         return effectRows > 0;
+    }
+
+    @Override
+    public UserThingsResponse userThingsDetail(Long userId) {
+        UserThings userThings = userThingsMapper.selectById(userId);
+        return UserThingsResponse.of(userThings);
     }
 }

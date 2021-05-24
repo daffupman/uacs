@@ -7,8 +7,8 @@ import io.daff.exception.UnexpectedException;
 import io.daff.uacs.core.enums.GrantTypeEnum;
 import io.daff.uacs.service.config.shiro.token.MobilePhoneCodeToken;
 import io.daff.uacs.service.entity.po.UserThings;
-import io.daff.uacs.service.entity.req.OAuthRequest;
-import io.daff.uacs.service.entity.resp.OAuthResponse;
+import io.daff.uacs.service.entity.req.SignInRequest;
+import io.daff.uacs.service.entity.resp.SignInResponse;
 import io.daff.uacs.service.service.BaseService;
 import io.daff.uacs.service.service.PassportService;
 import io.daff.uacs.service.util.OAuthTokenUtil;
@@ -51,33 +51,33 @@ public class PassportServiceImpl implements PassportService {
     private String appSecret = "a653";
 
     @Override
-    public OAuthResponse signIn(OAuthRequest oAuthRequest) {
+    public SignInResponse signIn(SignInRequest signInRequest) {
 
         AuthenticationToken token;
         Subject subject = SecurityUtils.getSubject();
-        String account = oAuthRequest.getAccount();
+        String account = signInRequest.getAccount();
 
         // 根据不同的登录方式生成不同token
-        if (TYPE_AP.equals(oAuthRequest.getType())) {
+        if (TYPE_AP.equals(signInRequest.getType())) {
             // 帐密登录
-            String password = oAuthRequest.getPassword();
+            String password = signInRequest.getPassword();
             if (StringUtils.isEmpty(password)) {
                 throw new ParamMissException("密码必填");
             }
 
             // 使用用户名密码Token
             token = new UsernamePasswordToken(account, password);
-        } else if (TYPE_MC.equals(oAuthRequest.getType())) {
+        } else if (TYPE_MC.equals(signInRequest.getType())) {
             // 手机号验证码登录
 
-            String code = oAuthRequest.getCode();
+            String code = signInRequest.getCode();
             if (StringUtils.isEmpty(code)) {
                 throw new ParamMissException("验证码必填");
             }
             // 生成手机号Token
             token = new MobilePhoneCodeToken(account, code);
         } else {
-            log.error("登录类型非法，登录帐户：{}", oAuthRequest.getAccount());
+            log.error("登录类型非法，登录帐户：{}", signInRequest.getAccount());
             throw new UnexpectedException("登录类型非法");
         }
 
@@ -100,6 +100,6 @@ public class PassportServiceImpl implements PassportService {
         UserThings userThings = baseService.matchAccount(account);
         String accessToken = OAuthTokenUtil.generateAccessToken(GrantTypeEnum.PASSWORD, userThings.getId().toString(), userThings.getPassword(), appId, appSecret);
         String refreshToken = OAuthTokenUtil.generateRefreshToken(GrantTypeEnum.PASSWORD, userThings.getId().toString(), userThings.getPassword(), appId, appSecret);
-        return new OAuthResponse(userThings.getId(), userThings.getName(), userThings.getNickName(), accessToken, refreshToken);
+        return new SignInResponse(userThings.getId(), userThings.getName(), userThings.getNickName(), accessToken, refreshToken);
     }
 }

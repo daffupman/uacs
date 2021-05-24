@@ -1,7 +1,7 @@
 package io.daff.uacs.service.service;
 
-import io.daff.uacs.service.entity.req.OAuthRequest;
-import io.daff.uacs.service.entity.resp.OAuthResponse;
+import io.daff.uacs.service.entity.req.SignInRequest;
+import io.daff.uacs.service.entity.resp.SignInResponse;
 
 /**
  * @author daff
@@ -9,5 +9,5 @@ import io.daff.uacs.service.entity.resp.OAuthResponse;
  */
 public interface PassportService {
 
-    OAuthResponse signIn(OAuthRequest oAuthRequest);
+    SignInResponse signIn(SignInRequest signInRequest);
 }
