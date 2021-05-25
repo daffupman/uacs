@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.daff.uacs.service.mapper.AppInfoMapper">
+  <resultMap id="BaseResultMap" type="io.daff.uacs.service.entity.po.AppInfo">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="app_name" jdbcType="VARCHAR" property="appName" />
+    <result column="app_id" jdbcType="VARCHAR" property="appId" />
+    <result column="app_secret" jdbcType="VARCHAR" property="appSecret" />
+    <result column="grant_type" jdbcType="CHAR" property="grantType" />
+    <result column="scope" jdbcType="CHAR" property="scope" />
+    <result column="redirect_url" jdbcType="VARCHAR" property="redirectUrl" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_by" jdbcType="CHAR" property="createBy" />
+    <result column="update_by" jdbcType="CHAR" property="updateBy" />
+    <result column="create_at" jdbcType="TIMESTAMP" property="createAt" />
+    <result column="update_at" jdbcType="TIMESTAMP" property="updateAt" />
+  </resultMap>
+  <sql id="baseSelectFields">
+    `id`, `app_name`, `app_id`, `app_secret`, `grant_type`, `scope`, `redirect_url`, `description`, `status`, `create_by`, `update_by`, `create_at`, `update_at`
+  </sql>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into app_info(
+	  <trim suffixOverrides=",">
+			<if test="id != null">`id`,</if>
+			<if test="appName != null">`app_name`,</if>
+			<if test="appId != null">`app_id`,</if>
+			<if test="appSecret != null">`app_secret`,</if>
+			<if test="grantType != null">`grant_type`,</if>
+			<if test="scope != null">`scope`,</if>
+			<if test="redirectUrl != null">`redirect_url`,</if>
+			<if test="description != null">`description`,</if>
+			<if test="status != null">`status`,</if>
+			<if test="createBy != null">`create_by`,</if>
+			<if test="updateBy != null">`update_by`,</if>
+			<if test="createAt != null">`create_at`,</if>
+			<if test="updateAt != null">`update_at`,</if>
+	  </trim>
+		) values (
+		<trim suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="appName != null">#{appName},</if>
+			<if test="appId != null">#{appId},</if>
+			<if test="appSecret != null">#{appSecret},</if>
+			<if test="grantType != null">#{grantType},</if>
+			<if test="scope != null">#{scope},</if>
+			<if test="redirectUrl != null">#{redirectUrl},</if>
+			<if test="description != null">#{description},</if>
+			<if test="status != null">#{status},</if>
+			<if test="createBy != null">#{createBy},</if>
+			<if test="updateBy != null">#{updateBy},</if>
+			<if test="createAt != null">#{createAt},</if>
+			<if test="updateAt != null">#{updateAt},</if>
+		</trim>
+		)
+  </insert>
+  <insert id="batchInsert" keyProperty="id" useGeneratedKeys="true">
+    insert into app_info(
+	  <trim suffixOverrides=",">
+			<if test="collection[0].id != null">`id`,</if>
+			<if test="collection[0].appName != null">`app_name`,</if>
+			<if test="collection[0].appId != null">`app_id`,</if>
+			<if test="collection[0].appSecret != null">`app_secret`,</if>
+			<if test="collection[0].grantType != null">`grant_type`,</if>
+			<if test="collection[0].scope != null">`scope`,</if>
+			<if test="collection[0].redirectUrl != null">`redirect_url`,</if>
+			<if test="collection[0].description != null">`description`,</if>
+			<if test="collection[0].status != null">`status`,</if>
+			<if test="collection[0].createBy != null">`create_by`,</if>
+			<if test="collection[0].updateBy != null">`update_by`,</if>
+			<if test="collection[0].createAt != null">`create_at`,</if>
+			<if test="collection[0].updateAt != null">`update_at`,</if>
+	  </trim>
+		) values
+		<foreach collection="list" item="item" separator=",">
+		(
+		<trim suffixOverrides=",">
+			<if test="item.id != null">#{item.id},</if>
+			<if test="item.appName != null">#{item.appName},</if>
+			<if test="item.appId != null">#{item.appId},</if>
+			<if test="item.appSecret != null">#{item.appSecret},</if>
+			<if test="item.grantType != null">#{item.grantType},</if>
+			<if test="item.scope != null">#{item.scope},</if>
+			<if test="item.redirectUrl != null">#{item.redirectUrl},</if>
+			<if test="item.description != null">#{item.description},</if>
+			<if test="item.status != null">#{item.status},</if>
+			<if test="item.createBy != null">#{item.createBy},</if>
+			<if test="item.updateBy != null">#{item.updateBy},</if>
+			<if test="item.createAt != null">#{item.createAt},</if>
+			<if test="item.updateAt != null">#{item.updateAt},</if>
+		</trim>
+		)
+		</foreach>
+  </insert>
+  <delete id="deleteById">
+    delete from app_info
+	  where `id` = #{id}
+  </delete>
+  <delete id="deleteByIds">
+    delete from app_info
+	  where `id`
+	  <foreach collection="collection" item="item" open="in (" close=")" separator=",">
+		#{item}
+	  </foreach>
+  </delete>
+  <update id="update">
+    update app_info
+		set
+		<trim suffixOverrides=",">
+			<if test="appName != null">`app_name` = #{appName},</if>
+			<if test="appId != null">`app_id` = #{appId},</if>
+			<if test="appSecret != null">`app_secret` = #{appSecret},</if>
+			<if test="grantType != null">`grant_type` = #{grantType},</if>
+			<if test="scope != null">`scope` = #{scope},</if>
+			<if test="redirectUrl != null">`redirect_url` = #{redirectUrl},</if>
+			<if test="description != null">`description` = #{description},</if>
+			<if test="status != null">`status` = #{status},</if>
+			<if test="createBy != null">`create_by` = #{createBy},</if>
+			<if test="updateBy != null">`update_by` = #{updateBy},</if>
+			<if test="createAt != null">`create_at` = #{createAt},</if>
+			<if test="updateAt != null">`update_at` = #{updateAt},</if>
+		</trim>
+		where `id` = #{id}
+  </update>
+  <update id="batchUpdate">
+    <foreach collection="list" item="item" separator=",">
+			update app_info
+			set
+			<trim suffixOverrides=",">
+				<if test="collection[0].appName != null">`app_name` = #{item.appName},</if>
+				<if test="collection[0].appId != null">`app_id` = #{item.appId},</if>
+				<if test="collection[0].appSecret != null">`app_secret` = #{item.appSecret},</if>
+				<if test="collection[0].grantType != null">`grant_type` = #{item.grantType},</if>
+				<if test="collection[0].scope != null">`scope` = #{item.scope},</if>
+				<if test="collection[0].redirectUrl != null">`redirect_url` = #{item.redirectUrl},</if>
+				<if test="collection[0].description != null">`description` = #{item.description},</if>
+				<if test="collection[0].status != null">`status` = #{item.status},</if>
+				<if test="collection[0].createBy != null">`create_by` = #{item.createBy},</if>
+				<if test="collection[0].updateBy != null">`update_by` = #{item.updateBy},</if>
+				<if test="collection[0].createAt != null">`create_at` = #{item.createAt},</if>
+				<if test="collection[0].updateAt != null">`update_at` = #{item.updateAt},</if>
+			</trim>
+			where `id` = #{item.id}
+		</foreach>
+  </update>
+  <select id="select" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from app_info
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="appName != null and appName != ''">`app_name` = #{appName}</if>
+				<if test="appId != null and appId != ''">`app_id` = #{appId}</if>
+				<if test="appSecret != null and appSecret != ''">`app_secret` = #{appSecret}</if>
+				<if test="grantType != null">`grant_type` = #{grantType}</if>
+				<if test="scope != null">`scope` = #{scope}</if>
+				<if test="redirectUrl != null and redirectUrl != ''">`redirect_url` = #{redirectUrl}</if>
+				<if test="description != null and description != ''">`description` = #{description}</if>
+				<if test="status != null">`status` = #{status}</if>
+				<if test="createBy != null and createBy != ''">`create_by` = #{createBy}</if>
+				<if test="updateBy != null and updateBy != ''">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectOne" resultMap="BaseResultMap">
+    select <include refid="baseSelectFields"/>
+	  from app_info
+	  <where>
+	    <trim suffixOverrides=",">
+				<if test="id != null and id != ''">`id` = #{id}</if>
+				<if test="appName != null and appName != ''">`app_name` = #{appName}</if>
+				<if test="appId != null and appId != ''">`app_id` = #{appId}</if>
+				<if test="appSecret != null and appSecret != ''">`app_secret` = #{appSecret}</if>
+				<if test="grantType != null">`grant_type` = #{grantType}</if>
+				<if test="scope != null">`scope` = #{scope}</if>
+				<if test="redirectUrl != null and redirectUrl != ''">`redirect_url` = #{redirectUrl}</if>
+				<if test="description != null and description != ''">`description` = #{description}</if>
+				<if test="status != null">`status` = #{status}</if>
+				<if test="createBy != null and createBy != ''">`create_by` = #{createBy}</if>
+				<if test="updateBy != null and updateBy != ''">`update_by` = #{updateBy}</if>
+				<if test="createAt != null">`create_at` = #{createAt}</if>
+				<if test="updateAt != null">`update_at` = #{updateAt}</if>
+	    </trim>
+	  </where>
+  </select>
+  <select id="selectById" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from app_info
+		where `id` = #{id}
+  </select>
+  <select id="selectByIds" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from app_info
+		where `id`
+		<foreach collection="collection" item="item" open="in (" close=")" separator=",">
+			#{item}
+		</foreach>
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from app_info
+  </select>
+</mapper>
