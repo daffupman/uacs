@@ -49,4 +49,6 @@ public interface BaseService {
      * 用户是否可见指定层级
      */
     boolean userVisibleHierarchyList(String curUserSsoId, List<String> hierarchyIdList);
+
+    boolean userVisibleRoleList(Long currUserSsoId, List<String> roleIds);
 }

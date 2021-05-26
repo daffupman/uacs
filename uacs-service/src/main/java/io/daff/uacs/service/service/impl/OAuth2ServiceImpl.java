@@ -17,8 +17,10 @@ import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
 import io.daff.uacs.service.entity.po.AppInfo;
 import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.entity.req.OAuthRequest;
+import io.daff.uacs.service.entity.req.UseProfileRequest;
 import io.daff.uacs.service.entity.resp.AuthorizeRequest;
 import io.daff.uacs.service.entity.resp.OAuthResponse;
+import io.daff.uacs.service.entity.resp.UserProfileResponse;
 import io.daff.uacs.service.mapper.AppInfoMapper;
 import io.daff.uacs.service.mapper.UserThingsMapper;
 import io.daff.uacs.service.service.OAuth2Service;
@@ -305,6 +307,22 @@ public class OAuth2ServiceImpl implements OAuth2Service {
             throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "访问令牌无效");
         }
         return true;
+    }
+
+    @Override
+    public UserProfileResponse userProfile(UseProfileRequest useProfileRequest) {
+        String accessToken = useProfileRequest.getAccessToken();
+        if (JwtUtil.isExpired(accessToken)) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
+        }
+
+        String subjectId = JwtUtil.getSubjectId(accessToken);
+        if (!String.valueOf(useProfileRequest.getUserId()).equals(subjectId)) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "用户与访问令牌不一致");
+        }
+
+        UserThings userThings = userThingsMapper.selectById(useProfileRequest.getUserId());
+        return UserProfileResponse.of(userThings);
     }
 
     /**

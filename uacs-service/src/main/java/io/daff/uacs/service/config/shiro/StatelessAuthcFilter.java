@@ -8,7 +8,9 @@ import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.util.StringUtils;
 
@@ -96,6 +98,8 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
             // 登录失败
             return false;
         }
+
+        request.setAttribute(SystemConstants.CURRENT_LOGIN_USER, JwtUtil.getSubjectId(accessToken));
 
         // 登录成功
         return true;

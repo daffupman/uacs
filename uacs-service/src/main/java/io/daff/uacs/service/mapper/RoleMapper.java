@@ -1,6 +1,7 @@
 package io.daff.uacs.service.mapper;
 
 import io.daff.uacs.service.entity.po.Role;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -31,5 +32,6 @@ public interface RoleMapper {
 
     List<String> selectRolesByUserId(Long curUserSsoId);
 
-    List<Role> selectByName(String name);
+    List<Role> selectByConditions(@Param("name") String name,
+                                  @Param("underRoleIds") List<String> underRoleIds);
 }

@@ -177,13 +177,20 @@
 		LEFT JOIN user_role_mapping urm on r.id = urm.role_id
 		WHERE urm.user_id = #{userId}
 	</select>
-	<select id="selectRolesByUserId" resultType="java.lang.String"></select>
-  <select id="selectByName" resultMap="BaseResultMap">
+	<select id="selectRolesByUserId" resultType="java.lang.String">
+
+	</select>
+  <select id="selectByConditions" resultMap="BaseResultMap">
 		select <include refid="baseSelectFields"/>
 		from role
 		<where>
 			<if test="name != null and name != ''">
 				name like concat('%', #{name}, '%')
+			</if>
+			<if test="underRoleIds != null and underRoleIds.size > 0">
+				<foreach collection="underRoleIds" item="roleId" open="id in (" close=")" separator=",">
+					#{roleId}
+				</foreach>
 			</if>
 		</where>
 	</select>
