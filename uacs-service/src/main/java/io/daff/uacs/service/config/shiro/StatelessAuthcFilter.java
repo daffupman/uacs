@@ -7,9 +7,11 @@ import io.daff.uacs.service.config.shiro.token.JwtToken;
 import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.ResponseUtil;
+import io.daff.uacs.service.util.SimpleRedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletRequest;
@@ -23,9 +25,16 @@ import javax.servlet.http.HttpServletRequest;
  * @since 2020/7/12
  */
 @Slf4j
+@Component
 public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String ACCESS_TOKEN_REDIS_PREFIX = "access_token:";
+    private SimpleRedisUtil simpleRedisUtil;
+
+    public StatelessAuthcFilter(SimpleRedisUtil simpleRedisUtil) {
+        this.simpleRedisUtil = simpleRedisUtil;
+    }
 
     /**
      * 从header尝试获取token，如果获取到则去登录
@@ -57,16 +66,23 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
             return false;
         }
         accessToken = accessToken.substring(BEARER_PREFIX.length());
+        String subjectId;
         try {
-            JwtUtil.getSubjectId(accessToken);
+            subjectId = JwtUtil.getSubjectId(accessToken);
+            if (StringUtils.isEmpty(subjectId)) {
+                log.error("非法的访问令牌，令牌无subjectId: {}", accessToken);
+                Response<Void> error = Response.error(Hint.AUTHENTICATION_FAILED, "非法的访问令牌");
+                ResponseUtil.printJsonError(response, error);
+                return false;
+            }
         } catch (Exception e) {
-            log.error("错误的accessToken", e);
+            log.error("非法的访问令牌", e);
             Response<Void> error = Response.error(Hint.AUTHENTICATION_FAILED, "非法的访问令牌");
             ResponseUtil.printJsonError(response, error);
             return false;
         }
 
-        if (JwtUtil.isExpired(accessToken)) {
+        if (JwtUtil.isExpired(accessToken) || StringUtils.isEmpty(simpleRedisUtil.get(ACCESS_TOKEN_REDIS_PREFIX + subjectId))) {
             log.error("访问令牌已过期");
             Response<Void> error = Response.error(Hint.AUTHENTICATION_FAILED, "过期的访问令牌");
             ResponseUtil.printJsonError(response, error);
@@ -96,6 +112,8 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
             // 登录失败
             return false;
         }
+
+        request.setAttribute(SystemConstants.CURRENT_LOGIN_USER, JwtUtil.getSubjectId(accessToken));
 
         // 登录成功
         return true;

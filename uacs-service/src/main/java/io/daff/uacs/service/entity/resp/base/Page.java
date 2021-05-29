@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,12 +21,12 @@ public class Page<T> {
     /**
      * 数据的总数
      */
-    private Long total;
+    private Long total = 0L;
 
     /**
      * 数据列表
      */
-    private List<T> list;
+    private List<T> list = new ArrayList<>();
 
     public static <T> Page<T> of(Long total, List<T> list) {
         return new Page<>(total, list);

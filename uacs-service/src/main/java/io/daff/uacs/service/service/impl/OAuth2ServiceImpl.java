@@ -17,8 +17,12 @@ import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
 import io.daff.uacs.service.entity.po.AppInfo;
 import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.entity.req.OAuthRequest;
+import io.daff.uacs.service.entity.req.RevokeTokenRequest;
+import io.daff.uacs.service.entity.req.UserProfileRequest;
+import io.daff.uacs.service.entity.req.VerifyTokenRequest;
 import io.daff.uacs.service.entity.resp.AuthorizeRequest;
 import io.daff.uacs.service.entity.resp.OAuthResponse;
+import io.daff.uacs.service.entity.resp.UserProfileResponse;
 import io.daff.uacs.service.mapper.AppInfoMapper;
 import io.daff.uacs.service.mapper.UserThingsMapper;
 import io.daff.uacs.service.service.OAuth2Service;
@@ -36,7 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -55,8 +58,11 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     private AppInfoMapper appInfoMapper;
     @Resource
     private SimpleRedisUtil simpleRedisUtil;
-    @Resource
-    private HttpServletRequest request;
+
+    private static final String ACCESS_TOKEN_REDIS_PREFIX = "access_token:";
+    private static final String REFRESH_TOKEN_REDIS_PREFIX = "refresh_token:";
+    private static final long ACCESS_TOKEN_TTL = 30 * 60;
+    private static final long REFRESH_TOKEN_TTL = 30 * 24 * 60;
 
     @Override
     public OAuthResponse authorize(AuthorizeRequest authorizeRequest) {
@@ -288,22 +294,88 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 //    }
 
     @Override
-    public boolean verifyToken(String token) {
+    public boolean verifyToken(VerifyTokenRequest verifyTokenRequest) {
 
-        String ssoId = JwtUtil.getSubjectId(token);
+        String accessToken = verifyTokenRequest.getAccessToken();
+        Long userId = verifyTokenRequest.getUserId();
+
+        String ssoId = JwtUtil.getSubjectId(accessToken);
+        if (StringUtils.isEmpty(ssoId)) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "无效的访问令牌");
+        }
+        if (!userId.equals(Long.valueOf(ssoId))) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "用户与访问令牌不一致");
+        }
         UserThings userThings = userThingsMapper.selectOne(UserThings.builder().id(Long.valueOf(ssoId)).build());
-        if (userThings == null || !userThings.getStatus().equals(1)) {
+        if (userThings == null || !userThings.getStatus().equals(Byte.valueOf("1"))) {
             throw new NoSuchDataException("用户不存在或状态异常");
         }
-        if (JwtUtil.isExpired(token)) {
-            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "访问令牌已过期");
+        if (!JwtUtil.isExpired(accessToken)) {
+            String accessTokenFromRedis = simpleRedisUtil.get(ACCESS_TOKEN_REDIS_PREFIX + ssoId);
+            if (StringUtils.isEmpty(accessTokenFromRedis) || !accessTokenFromRedis.equals(accessToken)) {
+                throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
+            }
+        } else {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
         }
 
         try {
-            JwtUtil.verify(token, ssoId, userThings.getPassword());
+            JwtUtil.verify(accessToken, ssoId, userThings.getPassword());
         } catch (Exception e) {
             throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "访问令牌无效");
         }
+        return true;
+    }
+
+    @Override
+    public UserProfileResponse userProfile(UserProfileRequest userProfileRequest) {
+        String accessToken = userProfileRequest.getAccessToken();
+        String ssoId = JwtUtil.getSubjectId(accessToken);
+        if (StringUtils.isEmpty(ssoId)) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "无效的访问令牌");
+        }
+        if (!JwtUtil.isExpired(accessToken)) {
+            String accessTokenFromRedis = simpleRedisUtil.get(ACCESS_TOKEN_REDIS_PREFIX + ssoId);
+            if (StringUtils.isEmpty(accessTokenFromRedis) || !accessTokenFromRedis.equals(accessToken)) {
+                throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
+            }
+        } else {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
+        }
+
+        String subjectId = JwtUtil.getSubjectId(accessToken);
+        if (!String.valueOf(userProfileRequest.getUserId()).equals(subjectId)) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "用户与访问令牌不一致");
+        }
+
+        UserThings userThings = userThingsMapper.selectById(userProfileRequest.getUserId());
+        return UserProfileResponse.of(userThings);
+    }
+
+    @Override
+    public boolean revokeToken(RevokeTokenRequest revokeTokenRequest) {
+
+        String accessToken = revokeTokenRequest.getAccessToken();
+        String ssoId = JwtUtil.getSubjectId(accessToken);
+        if (StringUtils.isEmpty(ssoId)) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "无效的访问令牌");
+        }
+        if (!JwtUtil.isExpired(accessToken)) {
+            String accessTokenFromRedis = simpleRedisUtil.get(ACCESS_TOKEN_REDIS_PREFIX + ssoId);
+            if (StringUtils.isEmpty(accessTokenFromRedis) || !accessTokenFromRedis.equals(accessToken)) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+
+        String subjectId = JwtUtil.getSubjectId(accessToken);
+        if (!String.valueOf(revokeTokenRequest.getUserId()).equals(subjectId)) {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "用户与访问令牌不一致");
+        }
+
+        simpleRedisUtil.delete(ACCESS_TOKEN_REDIS_PREFIX + ssoId);
+
         return true;
     }
 
@@ -329,14 +401,17 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         AppInfo appInfo = appInfoMapper.selectOne(AppInfo.builder().appId(appId).build());
         List<String> bindScopes = appInfo.getBindScopes();
         oAuthResponse.setScope(bindScopes);
+        oAuthResponse.setUserId(Long.parseLong(resourceOwnerId));
 
         oAuthResponse.setExpiresIn(OAuthTokenUtil.ACCESS_TOKEN_TTL);
         String accessToken = OAuthTokenUtil.generateAccessToken(grantType, resourceOwnerId, resourceOwnerSecret, appId, appSecret);
+        simpleRedisUtil.set(ACCESS_TOKEN_REDIS_PREFIX + resourceOwnerId, accessToken, ACCESS_TOKEN_TTL);
         oAuthResponse.setAccessToken(accessToken);
 
         if (!ignoreGenerateRefreshToken) {
             // 需要刷新令牌
             String refreshToken = OAuthTokenUtil.generateRefreshToken(grantType, resourceOwnerId, resourceOwnerSecret, appId, appSecret);
+            simpleRedisUtil.set(REFRESH_TOKEN_REDIS_PREFIX + resourceOwnerId, refreshToken, REFRESH_TOKEN_TTL);
             oAuthResponse.setRefreshToken(refreshToken);
         }
     }

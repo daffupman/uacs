@@ -66,7 +66,7 @@ public class ShiroConfig {
 
         // 配置自定义的过滤器
         Map<String, Filter> filters = new LinkedHashMap<>();
-        filters.put("sauthc", new StatelessAuthcFilter());
+        filters.put("sauthc", new StatelessAuthcFilter(simpleRedisUtil));
         shiroFilterFactoryBean.setFilters(filters);
 
         // 配置访问规则

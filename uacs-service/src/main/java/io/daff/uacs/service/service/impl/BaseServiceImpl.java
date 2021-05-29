@@ -12,7 +12,6 @@ import io.daff.uacs.service.mapper.UserThingsMapper;
 import io.daff.uacs.service.service.BaseService;
 import io.daff.uacs.service.util.JacksonUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -60,7 +59,7 @@ public class BaseServiceImpl implements BaseService {
             });
         } else {
             RoleList = roleMapper.selectByUserId(userId);
-            simpleRedisUtil.set(key, JacksonUtil.beanToString(RoleList));
+            simpleRedisUtil.set(key, JacksonUtil.beanToString(RoleList), 60);
         }
 
         return RoleList;
@@ -127,12 +126,20 @@ public class BaseServiceImpl implements BaseService {
 
     @Override
     public String getIdentity(Long curUserSsoId) {
-        List<String> roleNameList = roleMapper.selectRolesByUserId(curUserSsoId);
+        List<String> roleNameList = getUserRolesBySsoId(curUserSsoId).stream().map(Role::getName).collect(Collectors.toList());
         return roleNameList.contains(Roles.SUPER_ADMIN) ? Roles.SUPER_ADMIN : Roles.COMMON_USER;
     }
 
     @Override
     public boolean userVisibleHierarchyList(String curUserSsoId, List<String> hierarchyIdList) {
         return getHierarchyList(curUserSsoId).containsAll(hierarchyIdList);
+    }
+
+    @Override
+    public boolean userVisibleRoleList(Long currUserSsoId, List<String> roleIds) {
+        if (getIdentity(currUserSsoId).equalsIgnoreCase(Roles.SUPER_ADMIN)) {
+            return true;
+        }
+        return getUserRolesBySsoId(currUserSsoId).stream().map(Role::getId).collect(Collectors.toList()).containsAll(roleIds);
     }
 }

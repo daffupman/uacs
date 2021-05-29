@@ -47,4 +47,7 @@ public class OAuthResponse {
      */
     @ApiModelProperty("state值")
     private String state;
+
+    @ApiModelProperty("用户id")
+    private Long userId;
 }
