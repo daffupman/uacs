@@ -12,6 +12,7 @@ import io.daff.uacs.service.entity.resp.SignInResponse;
 import io.daff.uacs.service.service.BaseService;
 import io.daff.uacs.service.service.PassportService;
 import io.daff.uacs.service.util.OAuthTokenUtil;
+import io.daff.uacs.service.util.SimpleRedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -37,6 +38,11 @@ public class PassportServiceImpl implements PassportService {
 
     @Resource
     private BaseService baseService;
+    @Resource
+    private SimpleRedisUtil simpleRedisUtil;
+
+    private static final long ACCESS_TOKEN_TTL = 30 * 60;
+    private static final long REFRESH_TOKEN_TTL = 30 * 24 * 60;
 
     /**
      * 登录类型：帐密
@@ -47,8 +53,10 @@ public class PassportServiceImpl implements PassportService {
      * 登录类型：手机号验证码
      */
     private static final String TYPE_MC = "mc";
-    private String appId = "a653";
-    private String appSecret = "a653";
+    private static final String appId = "a653";
+    private static final String appSecret = "a653";
+    private static final String ACCESS_TOKEN_REDIS_PREFIX = "access_token:";
+    private static final String REFRESH_TOKEN_REDIS_PREFIX = "refresh_token:";
 
     @Override
     public SignInResponse signIn(SignInRequest signInRequest) {
@@ -99,7 +107,9 @@ public class PassportServiceImpl implements PassportService {
 
         UserThings userThings = baseService.matchAccount(account);
         String accessToken = OAuthTokenUtil.generateAccessToken(GrantTypeEnum.PASSWORD, userThings.getId().toString(), userThings.getPassword(), appId, appSecret);
+        simpleRedisUtil.set(ACCESS_TOKEN_REDIS_PREFIX + userThings.getId(), accessToken, ACCESS_TOKEN_TTL);
         String refreshToken = OAuthTokenUtil.generateRefreshToken(GrantTypeEnum.PASSWORD, userThings.getId().toString(), userThings.getPassword(), appId, appSecret);
+        simpleRedisUtil.set(REFRESH_TOKEN_REDIS_PREFIX + userThings.getId(), refreshToken, REFRESH_TOKEN_TTL);
         return new SignInResponse(userThings.getId(), userThings.getName(), userThings.getNickName(), accessToken, refreshToken);
     }
 }

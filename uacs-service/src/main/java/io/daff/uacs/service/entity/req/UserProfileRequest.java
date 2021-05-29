@@ -3,17 +3,18 @@ package io.daff.uacs.service.entity.req;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author daff
  * @since 2021/5/26
  */
 @Data
-public class UseProfileRequest {
+public class UserProfileRequest {
 
-    @NotBlank(message = "用户id参数缺失")
+    @NotNull(message = "用户id参数缺失")
     private Long userId;
 
-    @NotBlank(message = "访问令牌")
+    @NotBlank(message = "访问令牌缺失")
     private String accessToken;
 }

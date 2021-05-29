@@ -2,7 +2,9 @@ package io.daff.uacs.web.api;
 
 import io.daff.entity.Response;
 import io.daff.uacs.service.entity.req.OAuthRequest;
-import io.daff.uacs.service.entity.req.UseProfileRequest;
+import io.daff.uacs.service.entity.req.RevokeTokenRequest;
+import io.daff.uacs.service.entity.req.UserProfileRequest;
+import io.daff.uacs.service.entity.req.VerifyTokenRequest;
 import io.daff.uacs.service.entity.resp.OAuthResponse;
 import io.daff.uacs.service.entity.resp.UserProfileResponse;
 import io.daff.uacs.service.service.OAuth2Service;
@@ -38,9 +40,23 @@ public class OauthApi {
 
     @PostMapping("/profile")
     public Response<UserProfileResponse> userProfile(@RequestBody @NotNull(message = "缺失必要参数")
-                                               @Valid UseProfileRequest useProfileRequest) {
+                                                     @Valid UserProfileRequest userProfileRequest) {
 
-        UserProfileResponse userProfileResponse = oAuth2Service.userProfile(useProfileRequest);
+        UserProfileResponse userProfileResponse = oAuth2Service.userProfile(userProfileRequest);
         return Response.ok(userProfileResponse);
+    }
+
+    @PostMapping("/verify")
+    public Response<Boolean> verifyToken(@RequestBody @NotNull(message = "缺失必要参数")
+                                         @Valid VerifyTokenRequest verifyTokenRequest) {
+
+        return Response.ok(oAuth2Service.verifyToken(verifyTokenRequest));
+    }
+
+    @PostMapping("/revoke")
+    public Response<Boolean> revokeToken(@RequestBody @NotNull(message = "缺失必要参数")
+                                         @Valid RevokeTokenRequest revokeTokenRequest) {
+
+        return Response.ok(oAuth2Service.revokeToken(revokeTokenRequest));
     }
 }
