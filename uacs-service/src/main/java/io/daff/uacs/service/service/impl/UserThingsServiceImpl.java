@@ -1,7 +1,7 @@
 package io.daff.uacs.service.service.impl;
 
 import com.github.pagehelper.PageInfo;
-import io.daff.consts.SystemConstants;
+import io.daff.consts.GlobalConstants;
 import io.daff.uacs.core.util.IdUtil;
 import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.entity.req.UserThingsSortableQueryRequest;
@@ -54,7 +54,7 @@ public class UserThingsServiceImpl implements UserThingsService {
             putUserThings.setName(userThingsRequest.getName());
             putUserThings.setMobilePhoneNo(userThingsRequest.getMobilePhoneNo());
             putUserThings.setEmail(userThingsRequest.getEmail());
-            String defaultPassword = SystemConstants.DEFAULT_PASSWORD;
+            String defaultPassword = GlobalConstants.DEFAULT_PASSWORD;
             String salt = StrongCryptoUtil.genSalt();
             String encrypt = StrongCryptoUtil.encrypt(defaultPassword, salt);
             putUserThings.setPassword(encrypt);

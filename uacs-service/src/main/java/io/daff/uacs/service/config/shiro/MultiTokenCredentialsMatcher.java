@@ -5,7 +5,7 @@ import io.daff.uacs.service.config.shiro.token.MobilePhoneCodeToken;
 import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
-import io.daff.util.PasswordUtils;
+import io.daff.util.StrongCryptoUtil;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
@@ -54,7 +54,7 @@ public class MultiTokenCredentialsMatcher implements CredentialsMatcher {
                 throw new ExcessiveAttemptsException("密码输入错误超过" + RETRIES_LIMIT + "次，请30分钟后重试");
             }
 
-            boolean success = PasswordUtils.validate(plainPassword, hashedPassword, salt);
+            boolean success = StrongCryptoUtil.validate(plainPassword, hashedPassword, salt);
             synchronized (MultiTokenCredentialsMatcher.class) {
                 if (!success) {
                     simpleRedisUtil.set("retries:" + upToken.getUsername(), String.valueOf(failRetries + 1), 60 * 30);

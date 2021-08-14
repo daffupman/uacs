@@ -1,6 +1,6 @@
 package io.daff.uacs.service.config.shiro;
 
-import io.daff.consts.SystemConstants;
+import io.daff.consts.GlobalConstants;
 import io.daff.entity.Response;
 import io.daff.enums.Hint;
 import io.daff.uacs.service.config.shiro.token.JwtToken;
@@ -50,7 +50,7 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
         if (req.getMethod().equalsIgnoreCase("OPTIONS")) {
             return true;
         }
-        String accessToken = req.getHeader(SystemConstants.AUTHORIZATION);
+        String accessToken = req.getHeader(GlobalConstants.AUTHORIZATION);
         if (StringUtils.isEmpty(accessToken)) {
             log.error("使用token登录失败，header缺少access_token参数");
             Response<Void> error = Response.error(Hint.PARAM_MISS_ERROR, "缺失访问令牌");
@@ -96,7 +96,7 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
             ResponseUtil.printJsonError(response, error);
             return false;
         }
-        if (!SystemConstants.ACCESS_TOKEN.equalsIgnoreCase(oAuthExtraInfo.getTokenType())) {
+        if (!GlobalConstants.ACCESS_TOKEN.equalsIgnoreCase(oAuthExtraInfo.getTokenType())) {
             Response<Void> error = Response.error(Hint.AUTHENTICATION_FAILED, "非法的访问令牌");
             ResponseUtil.printJsonError(response, error);
             return false;
@@ -113,7 +113,7 @@ public class StatelessAuthcFilter extends BasicHttpAuthenticationFilter {
             return false;
         }
 
-        request.setAttribute(SystemConstants.CURRENT_LOGIN_USER, JwtUtil.getSubjectId(accessToken));
+        request.setAttribute(GlobalConstants.CURRENT_LOGIN_USER, JwtUtil.getSubjectId(accessToken));
 
         // 登录成功
         return true;

@@ -3,7 +3,7 @@ package io.daff.uacs.service.service.impl;
 import io.daff.enums.Hint;
 import io.daff.exception.BaseException;
 import io.daff.exception.ParamMissException;
-import io.daff.exception.UnexpectedException;
+import io.daff.exception.ParamValidateException;
 import io.daff.uacs.core.enums.GrantTypeEnum;
 import io.daff.uacs.service.config.shiro.token.MobilePhoneCodeToken;
 import io.daff.uacs.service.entity.po.UserThings;
@@ -86,7 +86,7 @@ public class PassportServiceImpl implements PassportService {
             token = new MobilePhoneCodeToken(account, code);
         } else {
             log.error("登录类型非法，登录帐户：{}", signInRequest.getAccount());
-            throw new UnexpectedException("登录类型非法");
+            throw new ParamValidateException("登录类型非法");
         }
 
         // 使用相应的token登录

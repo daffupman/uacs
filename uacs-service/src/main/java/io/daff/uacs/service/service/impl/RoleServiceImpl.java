@@ -1,7 +1,7 @@
 package io.daff.uacs.service.service.impl;
 
 import com.github.pagehelper.PageInfo;
-import io.daff.consts.SystemConstants;
+import io.daff.consts.GlobalConstants;
 import io.daff.enums.Hint;
 import io.daff.exception.BaseException;
 import io.daff.uacs.core.common.Roles;
@@ -42,7 +42,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public String saveOrUpdateRole(RoleRequest roleRequest) {
 
-        Long currUserId = Long.valueOf((String) request.getAttribute(SystemConstants.CURRENT_LOGIN_USER));
+        Long currUserId = Long.valueOf((String) request.getAttribute(GlobalConstants.CURRENT_LOGIN_USER));
 
         int effectRows;
 
@@ -70,7 +70,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean removeRole(String roleId) {
 
-        Long currUserId = Long.valueOf((String) request.getAttribute(SystemConstants.CURRENT_LOGIN_USER));
+        Long currUserId = Long.valueOf((String) request.getAttribute(GlobalConstants.CURRENT_LOGIN_USER));
         if (!baseService.userVisibleRoleList(currUserId, Collections.singletonList(roleId))) {
             throw new BaseException(Hint.AUTHORITY_FAILED, "用户权限不足");
         }
@@ -87,7 +87,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Page<RoleResponse> pagingQueryRoles(RoleSortableQueryRequest roleSortableQueryRequest) {
 
-        Long currUserId = Long.valueOf((String) request.getAttribute(SystemConstants.CURRENT_LOGIN_USER));
+        Long currUserId = Long.valueOf((String) request.getAttribute(GlobalConstants.CURRENT_LOGIN_USER));
 
         List<String> currUserRoleIds = null;
         if (!baseService.getIdentity(currUserId).equalsIgnoreCase(Roles.SUPER_ADMIN)) {
@@ -106,7 +106,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleResponse roleDetail(String roleId) {
-        Long currUserId = Long.valueOf((String) request.getAttribute(SystemConstants.CURRENT_LOGIN_USER));
+        Long currUserId = Long.valueOf((String) request.getAttribute(GlobalConstants.CURRENT_LOGIN_USER));
         if (!baseService.userVisibleRoleList(currUserId, Collections.singletonList(roleId))) {
             throw new BaseException(Hint.AUTHORITY_FAILED, "用户权限不足");
         }

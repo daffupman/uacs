@@ -2,11 +2,9 @@ package io.daff.uacs.service.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.daff.entity.Response;
-import io.daff.enums.Codes;
 import io.daff.enums.Hint;
-import io.daff.enums.Messages;
 import io.daff.exception.BaseException;
-import io.daff.exception.UnexpectedException;
+import io.daff.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -59,8 +57,8 @@ public class GlobalExceptionHandler {
         return Response.error(Hint.PARAM_VALIDATE_ERROR, e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 
-    @ExceptionHandler(UnexpectedException.class)
-    public Response<Void> error(UnexpectedException e) {
+    @ExceptionHandler(BusinessException.class)
+    public Response<Void> error(BusinessException e) {
         log.info(e.getMessage(), e);
         return Response.error(Hint.SYSTEM_ERROR, e.getMessage());
     }
