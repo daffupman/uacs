@@ -49,7 +49,7 @@ public class JacksonUtil {
 
     public static <T> T stringToBean(String json, Class<?> clazz) {
         try {
-            return (T)JacksonConfig.toBean(json, clazz);
+            return JacksonConfig.toBean(json, clazz);
         } catch (JsonProcessingException e) {
             log.error("jackson序列化错误", e);
             throw new BaseException(Hint.SYSTEM_ERROR);
@@ -102,6 +102,7 @@ public class JacksonUtil {
         /**
          * 将json字符串转换成bean对象
          */
+        @SuppressWarnings("unchecked")
         public static <T> T toBean(String json, TypeReference<T> typeReference) throws JsonProcessingException {
             if (StringUtils.isEmpty(json)) {
                 return null;
@@ -113,6 +114,7 @@ public class JacksonUtil {
         /**
          * 将json字符串转换成bean对象
          */
+        @SuppressWarnings("unchecked")
         public static <T> T toBean(String json, Class<?> clazz) throws JsonProcessingException {
             if (StringUtils.isEmpty(json)) {
                 return null;
