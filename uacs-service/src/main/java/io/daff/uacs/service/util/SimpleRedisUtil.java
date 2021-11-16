@@ -67,4 +67,12 @@ public class SimpleRedisUtil {
         if (StringUtils.isEmpty(key)) { return; }
         stringRedisTemplate.delete(key);
     }
+
+    /**
+     * 按key删除值
+     */
+    public Boolean exist(String key) {
+        if (StringUtils.isEmpty(key)) { return false; }
+        return stringRedisTemplate.hasKey(key);
+    }
 }
