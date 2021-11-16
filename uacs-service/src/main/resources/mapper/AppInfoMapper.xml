@@ -202,4 +202,6 @@
     select	<include refid="baseSelectFields"/>
 		from app_info
   </select>
+	<select id="selectByUserId" resultMap="BaseResultMap">
+	</select>
 </mapper>

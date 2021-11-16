@@ -1,7 +1,8 @@
 package io.daff.uacs.service.service.cache;
 
 import io.daff.uacs.service.entity.po.AppInfo;
-import io.daff.uacs.service.mapper.AppInfoMapper;
+import io.daff.uacs.service.entity.po.Client;
+import io.daff.uacs.service.mapper.ClientMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -20,21 +21,21 @@ import java.util.stream.Collectors;
 public class AppInfoLocalData implements Loader{
 
     @Resource
-    private AppInfoMapper appInfoMapper;
+    private ClientMapper clientMapper;
 
-    private Map<String, AppInfo> appInfoCache = new ConcurrentHashMap<>();
+    private Map<String, Client> clientCache = new ConcurrentHashMap<>();
 
     public String getAppSecretById(String appId) {
-        return appInfoCache.get(appId) == null ? null : appInfoCache.get(appId).getAppSecret();
+        return clientCache.get(appId) == null ? null : clientCache.get(appId).getAppSecret();
     }
 
     @Override
     public void load() {
         new Thread(() -> {
             while (true) {
-                List<AppInfo> appInfoList = appInfoMapper.selectAll();
-                appInfoCache = appInfoList.stream().collect(Collectors.toMap(AppInfo::getAppId, appInfo -> appInfo));
-                log.info("local data => app info load success!");
+                List<Client> clientList = clientMapper.selectAll();
+                clientCache = clientList.stream().collect(Collectors.toMap(Client::getAppId, client -> client));
+                log.info("local data => client load success!");
 
                 try {
                     Thread.sleep(10 * 60 * 1000);
@@ -42,7 +43,7 @@ public class AppInfoLocalData implements Loader{
                     e.printStackTrace();
                 }
             }
-        }, "app-info-loader").start();
+        }, "client-loader").start();
     }
 
 }

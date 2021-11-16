@@ -26,4 +26,6 @@ public interface AppInfoMapper {
     List<AppInfo> selectByIds(List<String> ids);
 
     List<AppInfo> selectAll();
+
+    List<AppInfo> selectByUserId(Long userId);
 }

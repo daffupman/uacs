@@ -14,11 +14,11 @@ public class IpRequestContext implements Serializable {
         return ipThreadLocal.get();
     }
 
-    public static void setIp(String ip) {
+    public static void set(String ip) {
         ipThreadLocal.set(ip);
     }
 
-    public static void removeIp() {
+    public static void remove() {
         ipThreadLocal.remove();
     }
 }

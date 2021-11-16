@@ -1,5 +1,6 @@
 package io.daff.uacs.cms.service;
 
+import io.daff.uacs.service.entity.po.AppInfo;
 import io.daff.uacs.service.entity.po.Permission;
 import io.daff.uacs.service.entity.po.Role;
 import io.daff.uacs.service.entity.po.UserThings;
@@ -23,6 +24,12 @@ public interface BaseService {
      * @param userId
      */
     List<Role> getUserRolesBySsoId(Long userId);
+
+    /**
+     * 查询用户拥有的客户端
+     * @param userId
+     */
+    List<AppInfo> getUserAppInfosBySsoId(Long userId);
 
     /**
      * 查询用户拥有的权限
@@ -51,4 +58,6 @@ public interface BaseService {
     boolean userVisibleHierarchyList(String curUserSsoId, List<String> hierarchyIdList);
 
     boolean userVisibleRoleList(Long currUserSsoId, List<String> roleIds);
+
+    boolean userVisibleAppInfoList(Long currUserSsoId, List<Integer> appInfoIds);
 }

@@ -1,10 +1,9 @@
-package io.daff.uacs.service.aspect;
+package io.daff.uacs.web.aspect;
 
 import io.daff.uacs.core.util.IdUtil;
-import io.daff.uacs.service.anno.Monitor;
+import io.daff.uacs.web.anno.Monitor;
 import io.daff.uacs.service.context.IpRequestContext;
 import io.daff.uacs.service.util.JacksonUtil;
-import io.daff.util.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -61,7 +60,7 @@ public class MonitorAspect {
     }
 
     //@annotation指示器实现对标记了Metrics注解的方法进行匹配
-    @Pointcut("within(@io.daff.uacs.service.anno.Monitor *)")
+    @Pointcut("within(@io.daff.uacs.web.anno.Monitor *)")
     public void withMetricsAnnotation() {
     }
 
@@ -74,13 +73,13 @@ public class MonitorAspect {
     public Object metrics(ProceedingJoinPoint pjp) throws Throwable {
 
         // 设置远程ip
-        IpRequestContext.setIp(getRemoteIp(request));
+        IpRequestContext.set(getRemoteIp(request));
         // 设置MDC
         MDC.put("traceId", idUtil.nextId().toString());
 
         //通过连接点获取方法签名和方法上Metrics注解，并根据方法签名生成日志中要输出的方法定义描述
         MethodSignature signature = (MethodSignature) pjp.getSignature();
-        String name = String.format("【%s】【%s】", signature.getDeclaringType().toString(), signature.toLongString());
+        String name = String.format("%s#%s => ", signature.getDeclaringType().getSimpleName(), signature.getMethod().getName());
 
         // 优先从方法上获取
         Monitor monitor = signature.getMethod().getAnnotation(Monitor.class);
@@ -100,12 +99,12 @@ public class MonitorAspect {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
             HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-            name += String.format("【%s】", request.getRequestURL().toString());
+            name += String.format("%s", request.getRequestURL().toString());
         }
         //实现的是入参的日志输出
         Object[] requestParams = filterOutPrintableDateType(pjp.getArgs());
         if (monitor.recordRequestParams()) {
-            log.info(String.format("【MONITOR - 入参】调用 %s 的参数是：【%s】", name, JacksonUtil.beanToString(requestParams)));
+            log.info(String.format("【接口::入参】【%s】" + "：【%s】", name, JacksonUtil.beanToString(requestParams)));
         }
         //实现连接点方法的执行，以及成功失败的打点，出现异常的时候还会记录日志
         Object returnValue;
@@ -114,14 +113,14 @@ public class MonitorAspect {
             returnValue = pjp.proceed();
             if (monitor.recordExecuteSuccessTimeCost()) {
                 //在生产级代码中，我们应考虑使用类似Micrometer的指标框架，把打点信息记录到时间序列数据库中，实现通过图表来查看方法的调用次数和执行时间，在设计篇我们会重点介绍
-                log.info(String.format("【MONITOR - 成功】调用 %s 成功，耗时：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
+                log.info(String.format("【接口::成功】【%s】，耗时：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
             }
         } catch (Exception e) {
             if (monitor.recordExecuteFailureTimeCost()) {
-                log.info(String.format("【MONITOR - 失败】调用 %s 失败，耗时：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
+                log.info(String.format("【接口::失败】【%s】，耗时：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
             }
             if (monitor.recordException()) {
-                log.info(String.format("【MONITOR - 异常】调用 %s 出现异常！", name));
+                log.info(String.format("【接口::异常】【%s】", name));
             }
 
             //忽略异常的时候，使用一开始定义的getDefaultValue方法，来获取基本类型的默认值
@@ -134,9 +133,9 @@ public class MonitorAspect {
         }
         //实现了返回值的日志输出
         if (monitor.recordReturnValue()) {
-            log.info(String.format("【MONITOR - 出参】调用 %s 的返回：【%s】", name, JacksonUtil.beanToString(returnValue)));
+            log.info(String.format("【接口::出参】【%s】：【%s】", name, JacksonUtil.beanToString(returnValue)));
         }
-        IpRequestContext.removeIp();
+        IpRequestContext.remove();
         return returnValue;
     }
 

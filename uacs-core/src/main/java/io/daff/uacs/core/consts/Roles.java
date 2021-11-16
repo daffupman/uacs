@@ -1,4 +1,4 @@
-package io.daff.uacs.core.common;
+package io.daff.uacs.core.consts;
 
 /**
  * @author daffupman

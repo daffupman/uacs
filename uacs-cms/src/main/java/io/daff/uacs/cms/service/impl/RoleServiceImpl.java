@@ -8,7 +8,7 @@ import io.daff.uacs.cms.entity.req.RoleRequest;
 import io.daff.uacs.cms.service.BaseService;
 import io.daff.uacs.cms.service.RoleService;
 import io.daff.uacs.cms.util.PageUtil;
-import io.daff.uacs.core.common.Roles;
+import io.daff.uacs.core.consts.Roles;
 import io.daff.uacs.service.entity.po.Role;
 import io.daff.uacs.cms.entity.req.RoleSortableQueryRequest;
 import io.daff.uacs.cms.entity.resp.RoleResponse;

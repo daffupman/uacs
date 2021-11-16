@@ -2,10 +2,12 @@ package io.daff.uacs.cms.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.daff.uacs.cms.service.BaseService;
-import io.daff.uacs.core.common.Roles;
+import io.daff.uacs.core.consts.Roles;
+import io.daff.uacs.service.entity.po.AppInfo;
 import io.daff.uacs.service.entity.po.Permission;
 import io.daff.uacs.service.entity.po.Role;
 import io.daff.uacs.service.entity.po.UserThings;
+import io.daff.uacs.service.mapper.AppInfoMapper;
 import io.daff.uacs.service.mapper.HierarchyMapper;
 import io.daff.uacs.service.mapper.PermissionMapper;
 import io.daff.uacs.service.mapper.RoleMapper;
@@ -40,6 +42,8 @@ public class BaseServiceImpl implements BaseService {
     @Resource
     private HierarchyMapper hierarchyMapper;
     @Resource
+    private AppInfoMapper appInfoMapper;
+    @Resource
     private SimpleRedisUtil simpleRedisUtil;
 
     @Override
@@ -50,19 +54,36 @@ public class BaseServiceImpl implements BaseService {
     @Override
     public List<Role> getUserRolesBySsoId(Long userId) {
 
-        List<Role> RoleList;
+        List<Role> roleList;
 
         String key = "roles:" + userId;
-        String userRolesInRedis = simpleRedisUtil.get(key);
-        if (!StringUtils.isEmpty(userRolesInRedis)) {
-            RoleList = JacksonUtil.stringToBean(userRolesInRedis, new TypeReference<List<Role>>() {
+        String cachedRoles = simpleRedisUtil.get(key);
+        if (!StringUtils.isEmpty(cachedRoles)) {
+            roleList = JacksonUtil.stringToBean(cachedRoles, new TypeReference<List<Role>>() {
             });
         } else {
-            RoleList = roleMapper.selectByUserId(userId);
-            simpleRedisUtil.set(key, JacksonUtil.beanToString(RoleList), 60);
+            roleList = roleMapper.selectByUserId(userId);
+            simpleRedisUtil.set(key, JacksonUtil.beanToString(roleList), 60);
         }
 
-        return RoleList;
+        return roleList;
+    }
+
+    @Override
+    public List<AppInfo> getUserAppInfosBySsoId(Long userId) {
+        List<AppInfo> appInfoList;
+
+        String key = "app_infos:" + userId;
+        String cachedAppInfos = simpleRedisUtil.get(key);
+        if (!StringUtils.isEmpty(cachedAppInfos)) {
+            appInfoList = JacksonUtil.stringToBean(cachedAppInfos, new TypeReference<List<AppInfo>>() {
+            });
+        } else {
+            appInfoList = appInfoMapper.selectByUserId(userId);
+            simpleRedisUtil.set(key, JacksonUtil.beanToString(appInfoList), 60);
+        }
+
+        return appInfoList;
     }
 
     @Override
@@ -141,5 +162,13 @@ public class BaseServiceImpl implements BaseService {
             return true;
         }
         return getUserRolesBySsoId(currUserSsoId).stream().map(Role::getId).collect(Collectors.toList()).containsAll(roleIds);
+    }
+
+    @Override
+    public boolean userVisibleAppInfoList(Long currUserSsoId, List<Integer> appInfoIds) {
+        if (getIdentity(currUserSsoId).equalsIgnoreCase(Roles.SUPER_ADMIN)) {
+            return true;
+        }
+        return getUserAppInfosBySsoId(currUserSsoId);
     }
 }

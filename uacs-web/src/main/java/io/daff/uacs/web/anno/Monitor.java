@@ -1,4 +1,4 @@
-package io.daff.uacs.service.anno;
+package io.daff.uacs.web.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
