@@ -1,11 +1,11 @@
-package io.daff.uacs.service.controller;
+package io.daff.uacs.cms.controller;
 
 import io.daff.entity.Response;
-import io.daff.uacs.service.entity.req.RoleSortableQueryRequest;
-import io.daff.uacs.service.entity.req.RoleRequest;
-import io.daff.uacs.service.entity.resp.RoleResponse;
+import io.daff.uacs.cms.entity.req.RoleRequest;
+import io.daff.uacs.cms.entity.req.RoleSortableQueryRequest;
+import io.daff.uacs.cms.service.RoleService;
+import io.daff.uacs.cms.entity.resp.RoleResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
-import io.daff.uacs.service.service.RoleService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

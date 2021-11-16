@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/uacs?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
-    username: daff
-    password: 123456
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -17,4 +17,3 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
-    password: 123456

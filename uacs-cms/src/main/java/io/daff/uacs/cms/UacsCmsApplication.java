@@ -1,4 +1,4 @@
-package io.daff.uacs.service;
+package io.daff.uacs.cms;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

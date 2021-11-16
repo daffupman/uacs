@@ -3,10 +3,14 @@ package io.daff.uacs.service.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.daff.consts.GlobalConstants;
 import io.daff.enums.Hint;
-import io.daff.exception.*;
+import io.daff.exception.BaseException;
+import io.daff.exception.BusinessException;
+import io.daff.exception.InsufficientPermissionsException;
+import io.daff.exception.NoSuchDataException;
+import io.daff.exception.ParamMissException;
+import io.daff.exception.ParamValidateException;
 import io.daff.uacs.core.enums.GrantTypeEnum;
 import io.daff.uacs.core.enums.ResponseTypeEnum;
-import io.daff.uacs.service.config.shiro.ShiroSessionUtils;
 import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
 import io.daff.uacs.service.entity.po.AppInfo;
 import io.daff.uacs.service.entity.po.UserThings;
@@ -24,12 +28,8 @@ import io.daff.uacs.service.util.JacksonUtil;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.OAuthTokenUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
+import io.daff.util.StrongCryptoUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -103,7 +103,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 throw new ParamMissException("参数access_token缺失");
             }
             String code = this.generateAuthorizedCode(appId, JwtUtil.getSubjectId(accessToken));
-            String needScopesJson = needScopesJson = JacksonUtil.beanToString(needScopes);
+            String needScopesJson = JacksonUtil.beanToString(needScopes);
             // 授权码和其应该拥有的权限范围绑定
             simpleRedisUtil.set(
                     GlobalConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code,
@@ -198,20 +198,13 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
                     throw new ParamMissException("用户名或密码参数缺失");
                 }
-                Subject subject = SecurityUtils.getSubject();
-                try {
-                    subject.login(new UsernamePasswordToken(username, password));
-                } catch (IncorrectCredentialsException e) {
-                    log.error("认证登录失败", e);
+                UserThings userThingsByName = userThingsMapper.selectOne(UserThings.builder().name(username).build());
+                if (!StrongCryptoUtil.validate(password, userThingsByName.getPassword(), userThingsByName.getSalt())) {
                     throw new BaseException(Hint.AUTHENTICATION_FAILED, "帐户和密码不一致");
-                } catch (AuthenticationException e) {
-                    log.error("认证登录失败", e);
-                    throw new BaseException(Hint.AUTHENTICATION_FAILED, e.getMessage());
                 }
 
                 // 生成accessToken，refreshToken
-                UserThings grantedUserThings = (UserThings) subject.getPrincipals().getPrimaryPrincipal();
-                doGenerateTokens(grantTypeEnum, String.valueOf(grantedUserThings.getId()), grantedUserThings.getPassword(), appId, appInfo.getAppSecret(), false, oAuthResponse);
+                doGenerateTokens(grantTypeEnum, String.valueOf(userThingsByName.getId()), userThingsByName.getPassword(), appId, appInfo.getAppSecret(), false, oAuthResponse);
 
                 break;
             case CLIENT_CREDENTIALS:
@@ -430,13 +423,5 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         );
 
         return code;
-    }
-
-    /**
-     * 清除session中的登录信息
-     */
-    private void clearLoginInfoInSession() {
-        ShiroSessionUtils.removeAttribute(GlobalConstants.LOGIN_ERROR_RESPONSE);
-        ShiroSessionUtils.removeAttribute(GlobalConstants.CURRENT_LOGIN_USER);
     }
 }
