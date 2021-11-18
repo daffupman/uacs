@@ -1,4 +1,4 @@
-package io.daff.uacs.service.context;
+package io.daff.uacs.web.context;
 
 import java.io.Serializable;
 

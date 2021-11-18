@@ -2,7 +2,7 @@ package io.daff.uacs.web.aspect;
 
 import io.daff.uacs.core.util.IdUtil;
 import io.daff.uacs.web.anno.Monitor;
-import io.daff.uacs.service.context.IpRequestContext;
+import io.daff.uacs.web.context.IpRequestContext;
 import io.daff.uacs.service.util.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -55,6 +55,7 @@ public class MonitorAspect {
             float.class, int.class, long.class, short.class
     ).collect(toMap(clazz -> clazz, clazz -> Array.get(Array.newInstance(clazz, 1), 0)));
 
+    @SuppressWarnings("unchecked")
     public static <T> T getDefaultValue(Class<T> clazz) {
         return (T) DEFAULT_VALUES.get(clazz);
     }
@@ -71,6 +72,8 @@ public class MonitorAspect {
 
     @Around("controllerBean() || withMetricsAnnotation())")
     public Object metrics(ProceedingJoinPoint pjp) throws Throwable {
+
+        Instant start = Instant.now();
 
         // 设置远程ip
         IpRequestContext.set(getRemoteIp(request));
@@ -108,19 +111,18 @@ public class MonitorAspect {
         }
         //实现连接点方法的执行，以及成功失败的打点，出现异常的时候还会记录日志
         Object returnValue;
-        Instant start = Instant.now();
         try {
             returnValue = pjp.proceed();
             if (monitor.recordExecuteSuccessTimeCost()) {
                 //在生产级代码中，我们应考虑使用类似Micrometer的指标框架，把打点信息记录到时间序列数据库中，实现通过图表来查看方法的调用次数和执行时间，在设计篇我们会重点介绍
-                log.info(String.format("【接口::成功】【%s】，耗时：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
+                log.info(String.format("【接口::耗时】【%s】调用成功：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
             }
         } catch (Exception e) {
             if (monitor.recordExecuteFailureTimeCost()) {
-                log.info(String.format("【接口::失败】【%s】，耗时：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
+                log.info(String.format("【接口::耗时】【%s】调用失败：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
             }
             if (monitor.recordException()) {
-                log.info(String.format("【接口::异常】【%s】", name));
+                log.info(String.format("【接口::异常】【%s】，异常信息：", name));
             }
 
             //忽略异常的时候，使用一开始定义的getDefaultValue方法，来获取基本类型的默认值

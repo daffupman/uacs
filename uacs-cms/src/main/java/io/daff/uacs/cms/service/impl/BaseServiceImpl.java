@@ -169,6 +169,6 @@ public class BaseServiceImpl implements BaseService {
         if (getIdentity(currUserSsoId).equalsIgnoreCase(Roles.SUPER_ADMIN)) {
             return true;
         }
-        return getUserAppInfosBySsoId(currUserSsoId);
+        return getUserAppInfosBySsoId(currUserSsoId).stream().map(AppInfo::getId).collect(Collectors.toList()).containsAll(appInfoIds);
     }
 }
