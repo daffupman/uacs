@@ -2,7 +2,7 @@ package io.daff.uacs.web.interceptor;
 
 import io.daff.exception.ParamValidateException;
 import io.daff.uacs.service.entity.req.base.Signature;
-import io.daff.uacs.service.service.cache.AppInfoLocalData;
+import io.daff.uacs.service.service.cache.UacsBizDataLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -27,10 +27,10 @@ import java.util.Map;
 public class SignatureInterceptor extends HandlerInterceptorAdapter {
 
     @Resource
-    private AppInfoLocalData appInfoLocalData;
+    private UacsBizDataLoader uacsBizDataLoader;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         if (!(handler instanceof HandlerMethod)) {
             return true;
@@ -47,7 +47,7 @@ public class SignatureInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
 
-        String secret = appInfoLocalData.getAppSecretById(signature.getAppId());
+        String secret = uacsBizDataLoader.getAppSecretById(signature.getAppId());
         if (secret == null) {
             throw new ParamValidateException("无效的app_id");
         }

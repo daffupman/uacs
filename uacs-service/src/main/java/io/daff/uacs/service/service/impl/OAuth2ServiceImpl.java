@@ -384,6 +384,13 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                                   boolean ignoreGenerateRefreshToken,
                                   OAuthResponse oAuthResponse) {
 
+        if (StringUtils.isEmpty(resourceOwnerId)) {
+            resourceOwnerId = appId;
+        }
+        if (StringUtils.isEmpty(resourceOwnerSecret)) {
+            resourceOwnerSecret = appSecret;
+        }
+
         // 查询客户端的权限范围
         AppInfo appInfo = appInfoMapper.selectOne(AppInfo.builder().appId(appId).build());
         List<String> bindScopes = appInfo.getBindScopes();

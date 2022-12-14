@@ -1,6 +1,5 @@
 package io.daff.uacs.service.service.cache;
 
-import io.daff.uacs.service.entity.po.AppInfo;
 import io.daff.uacs.service.entity.po.Client;
 import io.daff.uacs.service.mapper.ClientMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +9,9 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-public class AppInfoLocalData implements Loader{
+public class UacsBizDataLoader implements BizDataLoader {
 
     @Resource
     private ClientMapper clientMapper;
@@ -31,19 +33,12 @@ public class AppInfoLocalData implements Loader{
 
     @Override
     public void load() {
-        new Thread(() -> {
-            while (true) {
-                List<Client> clientList = clientMapper.selectAll();
-                clientCache = clientList.stream().collect(Collectors.toMap(Client::getAppId, client -> client));
-                log.info("local data => client load success!");
-
-                try {
-                    Thread.sleep(10 * 60 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, "client-loader").start();
+        ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor(Executors.defaultThreadFactory());
+        ses.scheduleAtFixedRate(() -> {
+            List<Client> clientList = clientMapper.selectAll();
+            clientCache = clientList.stream().collect(Collectors.toMap(Client::getAppId, client -> client));
+            log.info("local data => client load success!");
+        }, 0L, 10, TimeUnit.MINUTES);
     }
 
 }

@@ -1,6 +1,6 @@
 package io.daff.uacs.web;
 
-import io.daff.uacs.service.service.cache.Loader;
+import io.daff.uacs.service.service.cache.BizDataLoader;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,7 +21,7 @@ import java.util.List;
 public class UacsWebApplication implements CommandLineRunner {
 
     @Resource
-    private List<Loader> loaders;
+    private List<BizDataLoader> bizDataLoaders;
 
     public static void main(String[] args) {
         SpringApplication.run(UacsWebApplication.class, args);
@@ -29,8 +29,8 @@ public class UacsWebApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (!CollectionUtils.isEmpty(loaders)) {
-            loaders.forEach(Loader::load);
+        if (!CollectionUtils.isEmpty(bizDataLoaders)) {
+            bizDataLoaders.forEach(BizDataLoader::load);
         }
     }
 }
