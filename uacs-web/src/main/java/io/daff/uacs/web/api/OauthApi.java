@@ -8,6 +8,7 @@ import io.daff.uacs.service.entity.req.VerifyTokenRequest;
 import io.daff.uacs.service.entity.resp.OAuthResponse;
 import io.daff.uacs.service.entity.resp.UserProfileResponse;
 import io.daff.uacs.service.service.OAuth2Service;
+import io.daff.uacs.web.anno.AccessLimiter;
 import io.daff.uacs.web.anno.ApiVersion;
 import io.daff.uacs.web.anno.Idempotent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class OauthApi {
     private OAuth2Service oAuth2Service;
 
     @PostMapping("/token")
-    @Idempotent
+    @AccessLimiter(limit = 2)
     public Response<OAuthResponse> fetchToken(@RequestBody @NotNull(message = "缺失必要参数")
                                               @Valid OAuthRequest oAuthRequest) {
 
