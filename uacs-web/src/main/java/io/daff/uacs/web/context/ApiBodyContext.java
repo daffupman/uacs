@@ -1,6 +1,7 @@
 package io.daff.uacs.web.context;
 
-import io.daff.entity.Response;
+
+import io.daff.web.entity.Response;
 
 import java.io.Serializable;
 

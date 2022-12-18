@@ -1,15 +1,14 @@
 package io.daff.uacs.cms.service.impl;
 
-import io.daff.consts.GlobalConstants;
-import io.daff.enums.Hint;
-import io.daff.exception.BaseException;
 import io.daff.uacs.cms.entity.req.AppInfoRequest;
 import io.daff.uacs.cms.service.AppInfoService;
 import io.daff.uacs.cms.service.BaseService;
 import io.daff.uacs.service.entity.po.AppInfo;
-import io.daff.uacs.service.entity.po.Role;
 import io.daff.uacs.service.mapper.AppInfoMapper;
-import io.daff.util.StringHelper;
+import io.daff.utils.common.StringUtil;
+import io.daff.web.consts.GlobalConstants;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -54,8 +53,8 @@ public class AppInfoServiceImpl implements AppInfoService {
         } else {
             // 新增角色
             putAppInfo.setCreateBy(currUserId);
-            putAppInfo.setAppId(StringHelper.uuid().substring(0, 10));
-            putAppInfo.setAppSecret(StringHelper.uuid().substring(0, 10));
+            putAppInfo.setAppId(StringUtil.uuid().substring(0, 10));
+            putAppInfo.setAppSecret(StringUtil.uuid().substring(0, 10));
             appInfoId = appInfoMapper.insert(putAppInfo);
         }
 

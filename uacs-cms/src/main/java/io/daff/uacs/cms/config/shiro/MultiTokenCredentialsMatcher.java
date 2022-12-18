@@ -5,7 +5,7 @@ import io.daff.uacs.cms.config.shiro.token.MobilePhoneCodeToken;
 import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
-import io.daff.util.StrongCryptoUtil;
+import io.daff.utils.crypto.StrongCryptoUtil;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;

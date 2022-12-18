@@ -1,9 +1,9 @@
 package io.daff.uacs.web.interceptor;
 
-import io.daff.enums.Hint;
-import io.daff.exception.BaseException;
 import io.daff.uacs.service.util.SimpleRedisUtil;
 import io.daff.uacs.web.anno.Idempotent;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -32,7 +32,7 @@ public class IdempotentInterceptor extends HandlerInterceptorAdapter {
     private final ThreadLocal<String> idempotentCacheKeyThreadLocal = new ThreadLocal<>();
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
@@ -58,7 +58,7 @@ public class IdempotentInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         simpleRedisUtil.delete(idempotentCacheKeyThreadLocal.get());
         idempotentCacheKeyThreadLocal.remove();
     }

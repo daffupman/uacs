@@ -1,6 +1,5 @@
 package io.daff.uacs.web.api;
 
-import io.daff.entity.Response;
 import io.daff.uacs.service.entity.req.OAuthRequest;
 import io.daff.uacs.service.entity.req.RevokeTokenRequest;
 import io.daff.uacs.service.entity.req.UserProfileRequest;
@@ -10,7 +9,7 @@ import io.daff.uacs.service.entity.resp.UserProfileResponse;
 import io.daff.uacs.service.service.OAuth2Service;
 import io.daff.uacs.web.anno.AccessLimiter;
 import io.daff.uacs.web.anno.ApiVersion;
-import io.daff.uacs.web.anno.Idempotent;
+import io.daff.web.entity.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

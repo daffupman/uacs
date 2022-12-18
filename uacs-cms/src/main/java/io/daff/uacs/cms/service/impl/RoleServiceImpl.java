@@ -1,20 +1,20 @@
 package io.daff.uacs.cms.service.impl;
 
 import com.github.pagehelper.PageInfo;
-import io.daff.consts.GlobalConstants;
-import io.daff.enums.Hint;
-import io.daff.exception.BaseException;
 import io.daff.uacs.cms.entity.req.RoleRequest;
+import io.daff.uacs.cms.entity.req.RoleSortableQueryRequest;
+import io.daff.uacs.cms.entity.resp.RoleResponse;
 import io.daff.uacs.cms.service.BaseService;
 import io.daff.uacs.cms.service.RoleService;
 import io.daff.uacs.cms.util.PageUtil;
 import io.daff.uacs.core.consts.Roles;
 import io.daff.uacs.service.entity.po.Role;
-import io.daff.uacs.cms.entity.req.RoleSortableQueryRequest;
-import io.daff.uacs.cms.entity.resp.RoleResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
 import io.daff.uacs.service.mapper.RoleMapper;
-import io.daff.util.StringHelper;
+import io.daff.utils.common.StringUtil;
+import io.daff.web.consts.GlobalConstants;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -60,7 +60,7 @@ public class RoleServiceImpl implements RoleService {
             effectRows = roleMapper.update(putRole);
         } else {
             // 新增角色
-            putRole.setId(StringHelper.uuid());
+            putRole.setId(StringUtil.uuid());
             putRole.setCreateBy(currUserId);
             effectRows = roleMapper.insert(putRole);
         }

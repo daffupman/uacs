@@ -1,7 +1,7 @@
 package io.daff.uacs.service.entity.req.base;
 
-import io.daff.exception.ParamValidateException;
 import io.daff.uacs.service.util.Md5Util;
+import io.daff.web.exception.ParamValidateException;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

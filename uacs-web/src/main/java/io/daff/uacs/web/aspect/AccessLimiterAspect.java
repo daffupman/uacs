@@ -1,20 +1,17 @@
 package io.daff.uacs.web.aspect;
 
 import com.google.common.collect.Lists;
-import io.daff.enums.Hint;
-import io.daff.exception.BaseException;
 import io.daff.uacs.web.anno.AccessLimiter;
-import io.daff.util.StringHelper;
+import io.daff.utils.common.StringUtil;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.StandardEnvironment;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
@@ -53,7 +50,7 @@ public class AccessLimiterAspect {
         String limitKey = anno.key();
         int limit = anno.limit();
 
-        if (!StringHelper.hasText(limitKey)) {
+        if (!StringUtil.hasText(limitKey)) {
             // 默认生成规则 -> 服务名:类名:方法名
             String appName = environment.getProperty("spring.application.name");
             String clzName = method.getDeclaringClass().getSimpleName();

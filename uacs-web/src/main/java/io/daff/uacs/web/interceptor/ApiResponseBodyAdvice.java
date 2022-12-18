@@ -1,7 +1,7 @@
 package io.daff.uacs.web.interceptor;
 
-import io.daff.entity.Response;
 import io.daff.uacs.web.context.ApiBodyContext;
+import io.daff.web.entity.Response;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;

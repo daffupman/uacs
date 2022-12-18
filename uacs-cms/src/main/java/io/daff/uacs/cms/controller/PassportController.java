@@ -1,9 +1,9 @@
 package io.daff.uacs.cms.controller;
 
-import io.daff.entity.Response;
 import io.daff.uacs.cms.service.PassportService;
 import io.daff.uacs.cms.entity.req.SignInRequest;
 import io.daff.uacs.cms.entity.resp.SignInResponse;
+import io.daff.web.entity.Response;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

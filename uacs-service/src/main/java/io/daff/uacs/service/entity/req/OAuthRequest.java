@@ -1,7 +1,7 @@
 package io.daff.uacs.service.entity.req;
 
-import io.daff.anno.Limit;
 import io.daff.uacs.core.enums.GrantTypeEnum;
+import io.daff.valid.anno.Limit;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 

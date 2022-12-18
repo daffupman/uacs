@@ -1,7 +1,7 @@
 package io.daff.uacs.service.util;
 
 import com.google.common.base.Charsets;
-import io.daff.entity.Response;
+import io.daff.web.entity.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 

@@ -1,8 +1,8 @@
 package io.daff.uacs.web.interceptor;
 
-import io.daff.exception.ParamValidateException;
 import io.daff.uacs.service.entity.req.base.Signature;
 import io.daff.uacs.service.service.cache.UacsBizDataLoader;
+import io.daff.web.exception.ParamValidateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -78,6 +78,7 @@ public class SignatureInterceptor extends HandlerInterceptorAdapter {
                 try {
                     params.put(fieldName, arg.getClass().getDeclaredField(fieldName));
                 } catch (NoSuchFieldException e) {
+                    // ...
                 }
             }
         }

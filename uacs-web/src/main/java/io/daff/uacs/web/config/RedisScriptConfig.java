@@ -1,4 +1,4 @@
-package io.daff.uacs.service.config;
+package io.daff.uacs.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
  * @since 2022/12/15
  */
 @Configuration
-public class RedisConfig {
+public class RedisScriptConfig {
 
     @Bean
     public DefaultRedisScript<Boolean> rateLimitScript() {

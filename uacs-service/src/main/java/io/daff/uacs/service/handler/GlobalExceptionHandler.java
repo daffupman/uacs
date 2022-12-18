@@ -1,10 +1,10 @@
 package io.daff.uacs.service.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.daff.entity.Response;
-import io.daff.enums.Hint;
-import io.daff.exception.BaseException;
-import io.daff.exception.BusinessException;
+import io.daff.web.entity.Response;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
+import io.daff.web.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;

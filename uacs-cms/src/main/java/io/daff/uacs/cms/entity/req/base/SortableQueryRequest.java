@@ -1,9 +1,10 @@
 package io.daff.uacs.cms.entity.req.base;
 
-import io.daff.anno.Limit;
-import io.daff.exception.ParamValidateException;
+import io.daff.valid.anno.Limit;
+import io.daff.web.exception.ParamValidateException;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.Arrays;
  * @author daff
  * @since 2021/5/17
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public abstract class SortableQueryRequest extends QueryRequest {
 

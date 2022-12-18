@@ -1,11 +1,11 @@
 package io.daff.uacs.cms.controller;
 
-import io.daff.entity.Response;
 import io.daff.uacs.cms.entity.req.UserThingsSortableQueryRequest;
 import io.daff.uacs.cms.entity.req.UserThingsRequest;
 import io.daff.uacs.cms.service.UserThingsService;
 import io.daff.uacs.cms.entity.resp.UserThingsResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
+import io.daff.web.entity.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

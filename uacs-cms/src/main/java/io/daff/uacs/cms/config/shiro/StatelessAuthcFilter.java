@@ -1,13 +1,13 @@
 package io.daff.uacs.cms.config.shiro;
 
-import io.daff.consts.GlobalConstants;
-import io.daff.entity.Response;
-import io.daff.enums.Hint;
 import io.daff.uacs.cms.config.shiro.token.JwtToken;
 import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.ResponseUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
+import io.daff.web.consts.GlobalConstants;
+import io.daff.web.entity.Response;
+import io.daff.web.enums.Hint;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;

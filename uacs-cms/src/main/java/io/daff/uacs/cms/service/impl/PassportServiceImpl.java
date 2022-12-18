@@ -1,9 +1,5 @@
 package io.daff.uacs.cms.service.impl;
 
-import io.daff.enums.Hint;
-import io.daff.exception.BaseException;
-import io.daff.exception.ParamMissException;
-import io.daff.exception.ParamValidateException;
 import io.daff.uacs.cms.service.BaseService;
 import io.daff.uacs.cms.service.PassportService;
 import io.daff.uacs.core.enums.GrantTypeEnum;
@@ -13,6 +9,10 @@ import io.daff.uacs.cms.entity.req.SignInRequest;
 import io.daff.uacs.cms.entity.resp.SignInResponse;
 import io.daff.uacs.service.util.OAuthTokenUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
+import io.daff.web.exception.ParamMissException;
+import io.daff.web.exception.ParamValidateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;

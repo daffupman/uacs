@@ -1,8 +1,8 @@
 package io.daff.uacs.cms.controller;
 
-import io.daff.entity.Response;
 import io.daff.uacs.cms.entity.req.AppInfoRequest;
 import io.daff.uacs.cms.service.AppInfoService;
+import io.daff.web.entity.Response;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,7 +1,7 @@
 package io.daff.uacs.cms.entity.req.base;
 
 import io.daff.uacs.core.entity.req.Request;
-import io.daff.util.SqlLikeEscapeUtils;
+import io.daff.utils.sql.SqlLikeEscapeUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.util.StringUtils;

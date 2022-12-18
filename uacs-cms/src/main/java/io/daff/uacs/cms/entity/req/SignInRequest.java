@@ -1,6 +1,6 @@
 package io.daff.uacs.cms.entity.req;
 
-import io.daff.anno.Limit;
+import io.daff.valid.anno.Limit;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
