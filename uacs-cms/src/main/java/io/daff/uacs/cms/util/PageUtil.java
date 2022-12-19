@@ -1,12 +1,13 @@
 package io.daff.uacs.cms.util;
 
 import com.github.pagehelper.PageHelper;
+import io.daff.logging.DaffLogger;
 import io.daff.uacs.cms.entity.req.base.QueryRequest;
 import io.daff.uacs.cms.entity.req.base.SortableQueryRequest;
+import io.daff.uacs.core.enums.BaseModule;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.BaseException;
 import io.daff.web.exception.ParamValidateException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
@@ -18,8 +19,9 @@ import java.lang.reflect.Field;
  * @author daff
  * @since 2020/8/22
  */
-@Slf4j
 public class PageUtil {
+
+    private static final DaffLogger log = DaffLogger.getLogger(PageUtil.class);
 
     /**
      * 对QueryForm启用分页工具
@@ -61,7 +63,7 @@ public class PageUtil {
                         }
                     }
                 } catch (ClassNotFoundException e) {
-                    log.error("传入的class对象不存在", e);
+                    log.error("传入的class对象不存在", BaseModule.PAGE, e);
                     throw new BaseException(Hint.SYSTEM_ERROR);
                 }
 

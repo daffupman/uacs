@@ -1,16 +1,12 @@
 package io.daff.uacs.cms.config.shiro.realm;
 
+import io.daff.logging.DaffLogger;
 import io.daff.uacs.cms.service.BaseService;
+import io.daff.uacs.core.enums.BaseModule;
 import io.daff.uacs.service.entity.po.Permission;
 import io.daff.uacs.service.entity.po.Role;
 import io.daff.uacs.service.entity.po.UserThings;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.LockedAccountException;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -24,8 +20,9 @@ import java.util.stream.Collectors;
  * @author daff
  * @since 2020/7/14
  */
-@Slf4j
 public abstract class StatelessRealm extends AuthorizingRealm {
+
+    private static final DaffLogger log = DaffLogger.getLogger(StatelessRealm.class);
 
     protected BaseService baseService;
 
@@ -85,12 +82,12 @@ public abstract class StatelessRealm extends AuthorizingRealm {
     protected void userThingsStatusValidate(UserThings userThings, String subjectId) {
 
         if (userThings == null) {
-            log.error("不存在的用户：{}！", subjectId);
+            log.error("不存在的用户：{}！", BaseModule.AUTHC, subjectId);
             throw new UnknownAccountException("用户不存在！");
         }
 
         if (!userThings.getStatus().equals(Byte.parseByte("1"))) {
-            log.error("用户状态异常：{}", subjectId);
+            log.error("用户状态异常：{}", BaseModule.AUTHC, subjectId);
             throw new LockedAccountException("用户状态异常");
         }
     }

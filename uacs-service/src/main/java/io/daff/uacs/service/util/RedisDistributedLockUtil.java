@@ -12,18 +12,21 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 基于redis实现的分布式锁。该分布式锁可以自动释放锁，必须使用try resource catch语法，例：
- *      // ...
- *      try (RedisDistributedLockUtil lock = new RedisDistributedLockUtil(stringRedisTemplate, "demo", 30)) {
- *          boolean locked = lock.lock();
- *          if (locked) {
- *              // 业务逻辑
- *          }
- *      }
+ * 基于redis实现的分布式锁。该分布式锁可以自动释放锁，必须使用try resource catch语法，使用示例：
+ * <pre>
+ * try (RedisDistributedLockUtil lock = new RedisDistributedLockUtil(stringRedisTemplate, "demo", 30)) {
+ *     boolean locked = lock.lock();
+ *     if (locked) {
+ *         // 业务逻辑
+ *     }
+ * }
+ * </pre>
+ * 该分布式锁不可自动续期，建议使用redisson
  *
  * @author daff
  * @since 2022/12/14
  */
+@SuppressWarnings("all")
 public class RedisDistributedLockUtil implements AutoCloseable{
 
     private final StringRedisTemplate stringRedisTemplate;

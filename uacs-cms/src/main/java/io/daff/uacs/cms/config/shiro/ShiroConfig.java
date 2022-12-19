@@ -135,7 +135,7 @@ public class ShiroConfig {
      */
     @Bean
     public ModularRealmAuthenticator acsModularRealmAuthenticator(){
-        return new AcsModularRealmAuthenticator();
+        return new UacsModularRealmAuthenticator();
     }
 
     @Bean("jwtTokenRealm")

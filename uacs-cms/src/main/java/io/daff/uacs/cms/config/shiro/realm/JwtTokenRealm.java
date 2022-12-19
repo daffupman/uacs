@@ -4,7 +4,7 @@ import io.daff.uacs.cms.config.shiro.token.JwtToken;
 import io.daff.uacs.cms.service.BaseService;
 import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.util.JwtUtil;
-import lombok.extern.slf4j.Slf4j;
+import io.daff.utils.common.StringUtil;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
@@ -13,7 +13,6 @@ import org.apache.shiro.authc.AuthenticationToken;
  * @author daff
  * @since 2020/7/12
  */
-@Slf4j
 public class JwtTokenRealm extends StatelessRealm {
 
     public JwtTokenRealm(BaseService baseService) {
@@ -28,7 +27,10 @@ public class JwtTokenRealm extends StatelessRealm {
     protected UserThings verifyToken(AuthenticationToken token) {
         String jwtToken = (String) token.getPrincipal();
         String subjectId = JwtUtil.getSubjectId(jwtToken);
-        UserThings userThings = baseService.getUserByCondition(UserThings.builder().id(Long.parseLong(subjectId)).build());
+        UserThings userThings = null;
+        if (StringUtil.hasText(subjectId)) {
+            userThings = baseService.getUserByCondition(UserThings.builder().id(Long.parseLong(subjectId)).build());
+        }
         userThingsStatusValidate(userThings, subjectId);
         return userThings;
     }

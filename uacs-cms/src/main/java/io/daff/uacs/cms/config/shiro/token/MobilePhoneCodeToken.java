@@ -11,8 +11,8 @@ import org.apache.shiro.authc.AuthenticationToken;
 public class MobilePhoneCodeToken implements AuthenticationToken{
 
     private static final long serialVersionUID = 5292976771069728336L;
-    private String mobilePhoneNum;
-    private String code;
+    private final String mobilePhoneNum;
+    private final String code;
 
     public MobilePhoneCodeToken(String mobilePhoneNum, String code) {
         this.mobilePhoneNum = mobilePhoneNum;

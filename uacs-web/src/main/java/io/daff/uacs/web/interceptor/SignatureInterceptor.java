@@ -3,7 +3,6 @@ package io.daff.uacs.web.interceptor;
 import io.daff.uacs.service.entity.req.base.Signature;
 import io.daff.uacs.service.service.cache.UacsBizDataLoader;
 import io.daff.web.exception.ParamValidateException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -23,7 +22,6 @@ import java.util.Map;
  * @since 2021/11/15
  */
 @Component
-@Slf4j
 public class SignatureInterceptor extends HandlerInterceptorAdapter {
 
     @Resource

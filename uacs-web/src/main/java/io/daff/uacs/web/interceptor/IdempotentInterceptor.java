@@ -4,7 +4,6 @@ import io.daff.uacs.service.util.SimpleRedisUtil;
 import io.daff.uacs.web.anno.Idempotent;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.BaseException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -21,7 +20,6 @@ import java.lang.reflect.Method;
  * @since 2021/11/15
  */
 @Component
-@Slf4j
 public class IdempotentInterceptor extends HandlerInterceptorAdapter {
 
     @Resource

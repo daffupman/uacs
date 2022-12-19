@@ -11,7 +11,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 public class JwtToken implements AuthenticationToken{
 
     private static final long serialVersionUID = 5292976771069728336L;
-    private String jwtToken;
+    private final String jwtToken;
 
     public JwtToken(String jwtToken) {
         this.jwtToken = jwtToken;

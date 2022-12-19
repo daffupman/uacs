@@ -1,26 +1,22 @@
 package io.daff.uacs.cms.service.impl;
 
-import io.daff.uacs.cms.service.BaseService;
-import io.daff.uacs.cms.service.PassportService;
-import io.daff.uacs.core.enums.GrantTypeEnum;
+import io.daff.logging.DaffLogger;
 import io.daff.uacs.cms.config.shiro.token.MobilePhoneCodeToken;
-import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.cms.entity.req.SignInRequest;
 import io.daff.uacs.cms.entity.resp.SignInResponse;
+import io.daff.uacs.cms.service.BaseService;
+import io.daff.uacs.cms.service.PassportService;
+import io.daff.uacs.core.enums.BaseModule;
+import io.daff.uacs.core.enums.GrantTypeEnum;
+import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.util.OAuthTokenUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.BaseException;
 import io.daff.web.exception.ParamMissException;
 import io.daff.web.exception.ParamValidateException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.ExcessiveAttemptsException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -33,8 +29,9 @@ import javax.annotation.Resource;
  * @since 2021/5/21
  */
 @Service
-@Slf4j
 public class PassportServiceImpl implements PassportService {
+
+    private static final DaffLogger log = DaffLogger.getLogger(PassportServiceImpl.class);
 
     @Resource
     private BaseService baseService;
@@ -85,7 +82,7 @@ public class PassportServiceImpl implements PassportService {
             // 生成手机号Token
             token = new MobilePhoneCodeToken(account, code);
         } else {
-            log.error("登录类型非法，登录帐户：{}", signInRequest.getAccount());
+            log.error("登录类型非法，登录帐户：{}", BaseModule.AUTHC, signInRequest.getAccount());
             throw new ParamValidateException("登录类型非法");
         }
 
@@ -93,13 +90,13 @@ public class PassportServiceImpl implements PassportService {
         try {
             subject.login(token);
         } catch (IncorrectCredentialsException e) {
-            log.error("认证登录失败", e);
+            log.error("认证登录失败", BaseModule.AUTHC, e);
             throw new BaseException(Hint.AUTHENTICATION_FAILED, "帐户和密码不一致");
         } catch (ExcessiveAttemptsException | UnknownAccountException e) {
-            log.error("认证登录失败", e);
+            log.error("认证登录失败", BaseModule.AUTHC, e);
             throw new BaseException(Hint.AUTHENTICATION_FAILED, e.getMessage());
         } catch (AuthenticationException e) {
-            log.error("认证登录失败", e);
+            log.error("认证登录失败", BaseModule.AUTHC, e);
             throw new BaseException(Hint.AUTHENTICATION_FAILED, "登录失败，请联系官方");
         }
 

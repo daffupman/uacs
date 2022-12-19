@@ -1,6 +1,8 @@
 package io.daff.uacs.service.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.daff.logging.DaffLogger;
+import io.daff.uacs.core.enums.BaseModule;
 import io.daff.uacs.core.enums.GrantTypeEnum;
 import io.daff.uacs.core.enums.ResponseTypeEnum;
 import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
@@ -20,11 +22,11 @@ import io.daff.uacs.service.util.JacksonUtil;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.OAuthTokenUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
+import io.daff.utils.common.StringUtil;
 import io.daff.utils.crypto.StrongCryptoUtil;
 import io.daff.web.consts.GlobalConstants;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -38,8 +40,9 @@ import java.util.Objects;
  * @since 2020/7/25
  */
 @Service
-@Slf4j
 public class OAuth2ServiceImpl implements OAuth2Service {
+
+    private static final DaffLogger log = DaffLogger.getLogger(OAuth2ServiceImpl.class);
 
     @Resource
     private UserThingsMapper userThingsMapper;
@@ -173,7 +176,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 doGenerateTokens(grantTypeEnum, ssoId, userThings.getPassword(), appId, appInfo.getAppSecret(), false, oAuthResponse);
                 String grantedApp = authorizeCodeFormRedis.split(":")[1];
                 if (!Objects.equals(appId, grantedApp)) {
-                    log.error("授权码【{}】不是授予此客户端【{}】的", code, appId);
+                    log.error("授权码【{}】不是授予此客户端【{}】的", BaseModule.AUTHC, code, appId);
                     throw new BaseException(Hint.BUSINESS_LOGIC_ERROR, "授权码异常");
                 }
                 String authorizeMapFormRedis = simpleRedisUtil.get(GlobalConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code);
@@ -222,6 +225,9 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 }
 
                 ssoId = JwtUtil.getSubjectId(refreshToken);
+                if (!StringUtil.hasText(ssoId)) {
+                    throw new BaseException(Hint.AUTHENTICATION_FAILED, "非法的刷新令牌");
+                }
                 UserThings userThingsBySsoId = userThingsMapper.selectOne(UserThings.builder().id(Long.valueOf(ssoId)).build());
                 try {
                     JwtUtil.verify(refreshToken,ssoId, userThingsBySsoId.getPassword());

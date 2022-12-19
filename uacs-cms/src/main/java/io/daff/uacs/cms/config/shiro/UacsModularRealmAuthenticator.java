@@ -14,7 +14,7 @@ import java.util.Collection;
  * @author daff
  * @since 2020/10/10
  */
-public class AcsModularRealmAuthenticator extends ModularRealmAuthenticator {
+public class UacsModularRealmAuthenticator extends ModularRealmAuthenticator {
 
     @Override
     protected AuthenticationInfo doMultiRealmAuthentication(Collection<Realm> realms, AuthenticationToken token) {

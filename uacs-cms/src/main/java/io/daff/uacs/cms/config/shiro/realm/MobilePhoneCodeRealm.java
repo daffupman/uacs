@@ -3,7 +3,6 @@ package io.daff.uacs.cms.config.shiro.realm;
 import io.daff.uacs.cms.config.shiro.token.MobilePhoneCodeToken;
 import io.daff.uacs.cms.service.BaseService;
 import io.daff.uacs.service.entity.po.UserThings;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
@@ -12,7 +11,6 @@ import org.apache.shiro.authc.AuthenticationToken;
  * @author daff
  * @since 2020/7/12
  */
-@Slf4j
 public class MobilePhoneCodeRealm extends StatelessRealm {
 
     public MobilePhoneCodeRealm(BaseService baseService) {

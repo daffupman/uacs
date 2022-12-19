@@ -5,7 +5,6 @@ import io.daff.uacs.web.anno.AccessLimiter;
 import io.daff.utils.common.StringUtil;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.BaseException;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -27,7 +26,6 @@ import java.lang.reflect.Method;
  */
 @Aspect
 @Component
-@Slf4j
 public class AccessLimiterAspect {
 
     @Resource

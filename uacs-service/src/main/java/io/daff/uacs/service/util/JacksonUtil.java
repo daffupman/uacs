@@ -9,9 +9,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import io.daff.logging.DaffLogger;
+import io.daff.logging.module.InnerModule;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.BaseException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -25,15 +26,16 @@ import java.time.format.DateTimeFormatter;
  * @author daffupman
  * @since 2020/7/13
  */
-@Slf4j
 @Component
 public class JacksonUtil {
+
+    private static final DaffLogger log = DaffLogger.getLogger(JacksonUtil.class);
 
     public static String beanToString(Object bean) {
         try {
             return JacksonConfig.fromBean(bean);
         } catch (JsonProcessingException e) {
-            log.error("jackson序列化错误", e);
+            log.error("jackson序列化错误", InnerModule.INNER, e);
             throw new BaseException(Hint.SYSTEM_ERROR);
         }
     }
@@ -42,7 +44,7 @@ public class JacksonUtil {
         try {
             return JacksonConfig.toBean(json, typeReference);
         } catch (JsonProcessingException e) {
-            log.error("jackson序列化错误", e);
+            log.error("jackson序列化错误", InnerModule.INNER, e);
             throw new BaseException(Hint.SYSTEM_ERROR);
         }
     }
@@ -51,7 +53,7 @@ public class JacksonUtil {
         try {
             return JacksonConfig.toBean(json, clazz);
         } catch (JsonProcessingException e) {
-            log.error("jackson序列化错误", e);
+            log.error("jackson序列化错误", InnerModule.INNER, e);
             throw new BaseException(Hint.SYSTEM_ERROR);
         }
     }

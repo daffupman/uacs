@@ -3,7 +3,7 @@
   <Properties>
     <Property name="APP_NAME">uacs_web</Property>
     <Property name="LOG_FILE_PATH">../log/</Property>
-    <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%t] [%X{traceId}] [%c{1}] %m%n</Property>
+    <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%t] [%X{traceId}] [%c{1}] => %m%n</Property>
   </Properties>
 
   <Appenders>

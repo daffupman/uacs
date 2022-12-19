@@ -1,10 +1,11 @@
 package io.daff.uacs.web.aspect;
 
+import io.daff.logging.DaffLogger;
+import io.daff.uacs.core.enums.BaseModule;
 import io.daff.uacs.core.util.IdUtil;
+import io.daff.uacs.service.util.JacksonUtil;
 import io.daff.uacs.web.anno.Monitor;
 import io.daff.uacs.web.context.IpRequestContext;
-import io.daff.uacs.service.util.JacksonUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -40,9 +41,10 @@ import static java.util.stream.Collectors.toMap;
  */
 @Aspect
 @Component
-@Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)  // 将优先级设置为最高，可以防止Spring事务捕获不到异常
 public class MonitorAspect {
+
+    private static final DaffLogger log = DaffLogger.getLogger(MonitorAspect.class);
 
     @Resource
     private HttpServletRequest request;
@@ -107,7 +109,7 @@ public class MonitorAspect {
         //实现的是入参的日志输出
         Object[] requestParams = filterOutPrintableDateType(pjp.getArgs());
         if (monitor.recordRequestParams()) {
-            log.info(String.format("【接口::入参】【%s】" + "：【%s】", name, JacksonUtil.beanToString(requestParams)));
+            log.info("【接口::入参】【{}】：【{}】", BaseModule.MONITOR, name, JacksonUtil.beanToString(requestParams));
         }
         //实现连接点方法的执行，以及成功失败的打点，出现异常的时候还会记录日志
         Object returnValue;
@@ -115,14 +117,14 @@ public class MonitorAspect {
             returnValue = pjp.proceed();
             if (monitor.recordExecuteSuccessTimeCost()) {
                 //在生产级代码中，我们应考虑使用类似Micrometer的指标框架，把打点信息记录到时间序列数据库中，实现通过图表来查看方法的调用次数和执行时间，在设计篇我们会重点介绍
-                log.info(String.format("【接口::耗时】【%s】调用成功：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
+                log.info("【接口::耗时】【{}】调用成功：{} ms", BaseModule.MONITOR, name, Duration.between(start, Instant.now()).toMillis());
             }
         } catch (Exception e) {
             if (monitor.recordExecuteFailureTimeCost()) {
-                log.info(String.format("【接口::耗时】【%s】调用失败：%d ms", name, Duration.between(start, Instant.now()).toMillis()));
+                log.info("【接口::耗时】【{}】调用失败：%d ms", BaseModule.MONITOR, name, Duration.between(start, Instant.now()).toMillis());
             }
             if (monitor.recordException()) {
-                log.info(String.format("【接口::异常】【%s】，异常信息：", name));
+                log.info("【接口::异常】【{}】，异常信息：", BaseModule.MONITOR, name);
             }
 
             //忽略异常的时候，使用一开始定义的getDefaultValue方法，来获取基本类型的默认值
@@ -135,7 +137,7 @@ public class MonitorAspect {
         }
         //实现了返回值的日志输出
         if (monitor.recordReturnValue()) {
-            log.info(String.format("【接口::出参】【%s】：【%s】", name, JacksonUtil.beanToString(returnValue)));
+            log.info("【接口::出参】【{}】：【{}】", BaseModule.MONITOR, name, JacksonUtil.beanToString(returnValue));
         }
         IpRequestContext.remove();
         return returnValue;
