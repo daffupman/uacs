@@ -5,10 +5,11 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.daff.logging.DaffLogger;
+import io.daff.uacs.core.enums.BaseModule;
 import io.daff.uacs.core.enums.GrantTypeEnum;
 import io.daff.uacs.core.enums.TokenTypeEnum;
 import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -20,8 +21,9 @@ import java.util.UUID;
  * @author daffupman
  * @since 2020/7/12
  */
-@Slf4j
 public class JwtUtil {
+
+    private static final DaffLogger log = DaffLogger.getLogger(JwtUtil.class);
 
     /**
      * 令牌颁发者，表示该令牌由谁来创建的，很多OAuth部署中会将设为授权服务器的URL
@@ -44,7 +46,7 @@ public class JwtUtil {
      *
      * @param subjectId 用户的唯一标识
      * @param secret    用户的密钥
-     * @param tokenType
+     * @param tokenType 令牌类型
      * @return 返回jwt token
      */
     public static String create(String subjectId, String secret, OAuthExtraInfo oAuthExtraInfo, TokenTypeEnum tokenType) {
@@ -80,7 +82,7 @@ public class JwtUtil {
                     // 签名密钥
                     .sign(Algorithm.HMAC256(secret));
         } catch (UnsupportedEncodingException e) {
-            log.error("生成jwt token失败", e);
+            log.error("生成jwt token失败", BaseModule.AUTHC, e);
             return null;
         }
     }
@@ -124,7 +126,7 @@ public class JwtUtil {
 
             return oAuthExtraInfo;
         } catch (JWTDecodeException e) {
-            log.error("token解析失败", e);
+            log.error("token解析失败", BaseModule.AUTHC, e);
             return null;
         }
     }
@@ -140,7 +142,7 @@ public class JwtUtil {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getExpiresAt().before(new Date());
         } catch (JWTDecodeException e) {
-            log.error("token已经过期");
+            log.error("token已经过期", BaseModule.AUTHC);
             return false;
         }
     }
@@ -155,7 +157,7 @@ public class JwtUtil {
             DecodedJWT jwt = JWT.decode(jwtToken);
             return jwt.getSubject();
         } catch (JWTDecodeException e) {
-            log.error("token解析失败", e);
+            log.error("token解析失败", BaseModule.AUTHC, e);
             return null;
         }
     }

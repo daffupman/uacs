@@ -1,6 +1,5 @@
 package io.daff.uacs.service.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -66,5 +65,13 @@ public class SimpleRedisUtil {
     public void delete(String key) {
         if (StringUtils.isEmpty(key)) { return; }
         stringRedisTemplate.delete(key);
+    }
+
+    /**
+     * 按key删除值
+     */
+    public Boolean exist(String key) {
+        if (StringUtils.isEmpty(key)) { return false; }
+        return stringRedisTemplate.hasKey(key);
     }
 }

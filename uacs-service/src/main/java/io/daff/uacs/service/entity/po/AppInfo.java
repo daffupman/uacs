@@ -40,9 +40,9 @@ public class AppInfo {
 
     private Byte status;
 
-    private String createBy;
+    private Long createBy;
 
-    private String updateBy;
+    private Long updateBy;
 
     private Date createAt;
 
@@ -50,8 +50,7 @@ public class AppInfo {
 
     public List<String> getBindScopes() {
         List<String> scopes = new ArrayList<>();
-        if (!
-                StringUtils.isEmpty(this.scope)) {
+        if (!StringUtils.isEmpty(this.scope)) {
             if (scope.charAt(0) == '1') { scopes.add("insert"); }
             if (scope.charAt(1) == '1') { scopes.add("delete"); }
             if (scope.charAt(2) == '1') { scopes.add("update"); }

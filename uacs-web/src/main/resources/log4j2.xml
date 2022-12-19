@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="0">
+  <Properties>
+    <Property name="APP_NAME">uacs_web</Property>
+    <Property name="LOG_FILE_PATH">../log/</Property>
+    <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%t] [%X{traceId}] [%c{1}] => %m%n</Property>
+  </Properties>
+
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="${LOG_PATTERN}"/>
+    </Console>
+
+    <RollingRandomAccessFile name="info"
+                             fileName="${sys:LOG_FILE_PATH}/${APP_NAME}_info.log"
+                             filePattern="${sys:LOG_FILE_PATH}/previous/${APP_NAME}_info_%d_%i.log.gz"
+                             append="true">
+      <PatternLayout pattern="${LOG_PATTERN}"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1"/>
+        <SizeBasedTriggeringPolicy size="200MB"/>
+      </Policies>
+      <Filters>
+        <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+      </Filters>
+      <DefaultRolloverStrategy max="20"/>
+    </RollingRandomAccessFile>
+
+    <RollingRandomAccessFile name="error"
+                             fileName="${sys:LOG_FILE_PATH}/${APP_NAME}_error.log"
+                             filePattern="${sys:LOG_FILE_PATH}/previous/${APP_NAME}_error_%d_%i.log.gz"
+                             append="true">
+      <PatternLayout pattern="${LOG_PATTERN}"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1"/>
+        <SizeBasedTriggeringPolicy size="200MB"/>
+      </Policies>
+      <Filters>
+        <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+      </Filters>
+      <DefaultRolloverStrategy max="30"/>
+    </RollingRandomAccessFile>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="console"/>
+      <AppenderRef ref="info"/>
+      <AppenderRef ref="error"/>
+    </Root>
+    <!--		<logger name="io.daff.uacs.service.mapper" level="debug" additivity="false"/>-->
+  </Loggers>
+</Configuration>

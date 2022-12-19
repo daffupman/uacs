@@ -1,6 +1,6 @@
 package io.daff.uacs.core.util;
 
-import io.daff.util.SnowFlake;
+import io.daff.utils.common.SnowFlake;
 import org.springframework.stereotype.Component;
 
 /**

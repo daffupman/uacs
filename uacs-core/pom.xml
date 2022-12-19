@@ -19,8 +19,8 @@
   <dependencies>
     <dependency>
       <groupId>io.daff</groupId>
-      <artifactId>daff-core</artifactId>
-      <version>0.0.3</version>
+      <artifactId>utils</artifactId>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

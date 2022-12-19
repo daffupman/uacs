@@ -9,11 +9,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import io.daff.enums.Codes;
-import io.daff.enums.Hint;
-import io.daff.enums.Messages;
-import io.daff.exception.BaseException;
-import lombok.extern.slf4j.Slf4j;
+import io.daff.logging.DaffLogger;
+import io.daff.logging.module.InnerModule;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -27,15 +26,16 @@ import java.time.format.DateTimeFormatter;
  * @author daffupman
  * @since 2020/7/13
  */
-@Slf4j
 @Component
 public class JacksonUtil {
+
+    private static final DaffLogger log = DaffLogger.getLogger(JacksonUtil.class);
 
     public static String beanToString(Object bean) {
         try {
             return JacksonConfig.fromBean(bean);
         } catch (JsonProcessingException e) {
-            log.error("jackson序列化错误", e);
+            log.error("jackson序列化错误", InnerModule.INNER, e);
             throw new BaseException(Hint.SYSTEM_ERROR);
         }
     }
@@ -44,16 +44,16 @@ public class JacksonUtil {
         try {
             return JacksonConfig.toBean(json, typeReference);
         } catch (JsonProcessingException e) {
-            log.error("jackson序列化错误", e);
+            log.error("jackson序列化错误", InnerModule.INNER, e);
             throw new BaseException(Hint.SYSTEM_ERROR);
         }
     }
 
     public static <T> T stringToBean(String json, Class<?> clazz) {
         try {
-            return (T)JacksonConfig.toBean(json, clazz);
+            return JacksonConfig.toBean(json, clazz);
         } catch (JsonProcessingException e) {
-            log.error("jackson序列化错误", e);
+            log.error("jackson序列化错误", InnerModule.INNER, e);
             throw new BaseException(Hint.SYSTEM_ERROR);
         }
     }
@@ -104,6 +104,7 @@ public class JacksonUtil {
         /**
          * 将json字符串转换成bean对象
          */
+        @SuppressWarnings("unchecked")
         public static <T> T toBean(String json, TypeReference<T> typeReference) throws JsonProcessingException {
             if (StringUtils.isEmpty(json)) {
                 return null;
@@ -115,6 +116,7 @@ public class JacksonUtil {
         /**
          * 将json字符串转换成bean对象
          */
+        @SuppressWarnings("unchecked")
         public static <T> T toBean(String json, Class<?> clazz) throws JsonProcessingException {
             if (StringUtils.isEmpty(json)) {
                 return null;

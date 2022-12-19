@@ -1,6 +1,6 @@
 package io.daff.uacs.service.entity.resp;
 
-import io.daff.anno.Limit;
+import io.daff.valid.anno.Limit;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
@@ -14,6 +14,7 @@ import java.util.List;
  * @since 2020/7/25
  */
 @Data
+@SuppressWarnings("all")
 public class AuthorizeRequest {
 
     /**

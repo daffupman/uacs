@@ -1,6 +1,5 @@
 package io.daff.uacs.web.api;
 
-import io.daff.entity.Response;
 import io.daff.uacs.service.entity.req.OAuthRequest;
 import io.daff.uacs.service.entity.req.RevokeTokenRequest;
 import io.daff.uacs.service.entity.req.UserProfileRequest;
@@ -8,7 +7,9 @@ import io.daff.uacs.service.entity.req.VerifyTokenRequest;
 import io.daff.uacs.service.entity.resp.OAuthResponse;
 import io.daff.uacs.service.entity.resp.UserProfileResponse;
 import io.daff.uacs.service.service.OAuth2Service;
+import io.daff.uacs.web.anno.AccessLimiter;
 import io.daff.uacs.web.anno.ApiVersion;
+import io.daff.web.entity.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,7 @@ public class OauthApi {
     private OAuth2Service oAuth2Service;
 
     @PostMapping("/token")
+    @AccessLimiter(limit = 2)
     public Response<OAuthResponse> fetchToken(@RequestBody @NotNull(message = "缺失必要参数")
                                               @Valid OAuthRequest oAuthRequest) {
 

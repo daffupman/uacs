@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.daff.uacs.service.mapper.ClientMapper">
+  <resultMap id="BaseResultMap" type="io.daff.uacs.service.entity.po.Client">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="app_id" jdbcType="VARCHAR" property="appId" />
+    <result column="app_secret" jdbcType="VARCHAR" property="appSecret" />
+    <result column="is_del" jdbcType="TINYINT" property="isDel" />
+  </resultMap>
+  <sql id="baseSelectFields">
+    `id`, `app_id`, `app_secret`, `is_del`
+  </sql>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select	<include refid="baseSelectFields"/>
+		from client
+  </select>
+</mapper>

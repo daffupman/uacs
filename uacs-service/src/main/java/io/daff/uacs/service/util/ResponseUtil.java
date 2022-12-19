@@ -1,8 +1,9 @@
 package io.daff.uacs.service.util;
 
 import com.google.common.base.Charsets;
-import io.daff.entity.Response;
-import lombok.extern.slf4j.Slf4j;
+import io.daff.logging.DaffLogger;
+import io.daff.logging.module.InnerModule;
+import io.daff.web.entity.Response;
 import org.springframework.http.MediaType;
 
 import javax.servlet.ServletResponse;
@@ -13,8 +14,9 @@ import javax.servlet.ServletResponse;
  * @author daffupman
  * @since 2020/7/12
  */
-@Slf4j
 public class ResponseUtil {
+
+    private static final DaffLogger log = DaffLogger.getLogger(ResponseUtil.class);
 
     /**
      * 向response中输出异常信息
@@ -26,7 +28,7 @@ public class ResponseUtil {
             String errorMsg = JacksonUtil.JacksonConfig.getInstance().writeValueAsString(body);
             response.getWriter().write(errorMsg);
         } catch (Exception e) {
-            log.error("写异常到response失败", e);
+            log.error("写异常到response失败", InnerModule.WEB, e);
         }
     }
 

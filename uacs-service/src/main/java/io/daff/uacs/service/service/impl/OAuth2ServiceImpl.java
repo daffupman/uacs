@@ -1,18 +1,10 @@
 package io.daff.uacs.service.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.daff.consts.SystemConstants;
-import io.daff.enums.Hint;
-import io.daff.exception.BaseException;
-import io.daff.exception.InconsistentDataException;
-import io.daff.exception.InsufficientPermissionsException;
-import io.daff.exception.NoSuchDataException;
-import io.daff.exception.ParamMissException;
-import io.daff.exception.ParamValidateException;
-import io.daff.exception.UnsupportedParamType;
+import io.daff.logging.DaffLogger;
+import io.daff.uacs.core.enums.BaseModule;
 import io.daff.uacs.core.enums.GrantTypeEnum;
 import io.daff.uacs.core.enums.ResponseTypeEnum;
-import io.daff.uacs.service.config.shiro.ShiroSessionUtils;
 import io.daff.uacs.service.entity.dto.OAuthExtraInfo;
 import io.daff.uacs.service.entity.po.AppInfo;
 import io.daff.uacs.service.entity.po.UserThings;
@@ -30,12 +22,11 @@ import io.daff.uacs.service.util.JacksonUtil;
 import io.daff.uacs.service.util.JwtUtil;
 import io.daff.uacs.service.util.OAuthTokenUtil;
 import io.daff.uacs.service.util.SimpleRedisUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
+import io.daff.utils.common.StringUtil;
+import io.daff.utils.crypto.StrongCryptoUtil;
+import io.daff.web.consts.GlobalConstants;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -49,8 +40,9 @@ import java.util.Objects;
  * @since 2020/7/25
  */
 @Service
-@Slf4j
 public class OAuth2ServiceImpl implements OAuth2Service {
+
+    private static final DaffLogger log = DaffLogger.getLogger(OAuth2ServiceImpl.class);
 
     @Resource
     private UserThingsMapper userThingsMapper;
@@ -79,7 +71,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         }
         String appSecret = authorizeRequest.getAppSecret();
         if (!StringUtils.isEmpty(appSecret) && !appInfo.getAppSecret().equals(appSecret)) {
-            throw new InconsistentDataException("客户端id或客户端密钥错误");
+            throw new BusinessException("客户端id或客户端密钥错误");
         }
 
         // 校验范围：第三方输入的权限范围是否在自己已经拥有的权限范围之内
@@ -109,10 +101,10 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 throw new ParamMissException("参数access_token缺失");
             }
             String code = this.generateAuthorizedCode(appId, JwtUtil.getSubjectId(accessToken));
-            String needScopesJson = needScopesJson = JacksonUtil.beanToString(needScopes);
+            String needScopesJson = JacksonUtil.beanToString(needScopes);
             // 授权码和其应该拥有的权限范围绑定
             simpleRedisUtil.set(
-                    SystemConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code,
+                    GlobalConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code,
                     needScopesJson
             );
 
@@ -127,7 +119,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
             oAuthResponse.setExpiresIn(OAuthTokenUtil.ACCESS_TOKEN_TTL);
 
         } else {
-            throw new UnsupportedParamType("不支持的响应类型：" + responseType);
+            throw new ParamValidateException("不支持的响应类型：" + responseType);
         }
 
         return oAuthResponse;
@@ -172,7 +164,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 if (StringUtils.isEmpty(oAuthRequest.getRedirectUri())) {
                     throw new ParamMissException("重定向地址参数丢失");
                 }
-                String authorizeCodeFormRedis = simpleRedisUtil.get(SystemConstants.AUTHORIZE_CODE_PREFIX + code);
+                String authorizeCodeFormRedis = simpleRedisUtil.get(GlobalConstants.AUTHORIZE_CODE_PREFIX + code);
                 if (StringUtils.isEmpty(authorizeCodeFormRedis)) {
                     // 授权码会存储在redis中，并设置过期时间，如果查询不到说明已经过期
                     throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "授权码错误");
@@ -184,16 +176,16 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 doGenerateTokens(grantTypeEnum, ssoId, userThings.getPassword(), appId, appInfo.getAppSecret(), false, oAuthResponse);
                 String grantedApp = authorizeCodeFormRedis.split(":")[1];
                 if (!Objects.equals(appId, grantedApp)) {
-                    log.error("授权码【{}】不是授予此客户端【{}】的", code, appId);
+                    log.error("授权码【{}】不是授予此客户端【{}】的", BaseModule.AUTHC, code, appId);
                     throw new BaseException(Hint.BUSINESS_LOGIC_ERROR, "授权码异常");
                 }
-                String authorizeMapFormRedis = simpleRedisUtil.get(SystemConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code);
+                String authorizeMapFormRedis = simpleRedisUtil.get(GlobalConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code);
                 List<String> scopes = JacksonUtil.stringToBean(authorizeMapFormRedis, new TypeReference<List<String>>() {});
                 oAuthResponse.setScope(scopes);
 
                 // 删除授权码、授权码和scope/authorize
-                simpleRedisUtil.delete(SystemConstants.AUTHORIZE_CODE_PREFIX + code);
-                simpleRedisUtil.delete(SystemConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code);
+                simpleRedisUtil.delete(GlobalConstants.AUTHORIZE_CODE_PREFIX + code);
+                simpleRedisUtil.delete(GlobalConstants.AUTHORIZE_CODE_SCOPE_MAP_PREFIX + code);
 
                 break;
             case PASSWORD:
@@ -204,20 +196,13 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
                     throw new ParamMissException("用户名或密码参数缺失");
                 }
-                Subject subject = SecurityUtils.getSubject();
-                try {
-                    subject.login(new UsernamePasswordToken(username, password));
-                } catch (IncorrectCredentialsException e) {
-                    log.error("认证登录失败", e);
+                UserThings userThingsByName = userThingsMapper.selectOne(UserThings.builder().name(username).build());
+                if (!StrongCryptoUtil.validate(password, userThingsByName.getPassword(), userThingsByName.getSalt())) {
                     throw new BaseException(Hint.AUTHENTICATION_FAILED, "帐户和密码不一致");
-                } catch (AuthenticationException e) {
-                    log.error("认证登录失败", e);
-                    throw new BaseException(Hint.AUTHENTICATION_FAILED, e.getMessage());
                 }
 
                 // 生成accessToken，refreshToken
-                UserThings grantedUserThings = (UserThings) subject.getPrincipals().getPrimaryPrincipal();
-                doGenerateTokens(grantTypeEnum, String.valueOf(grantedUserThings.getId()), grantedUserThings.getPassword(), appId, appInfo.getAppSecret(), false, oAuthResponse);
+                doGenerateTokens(grantTypeEnum, String.valueOf(userThingsByName.getId()), userThingsByName.getPassword(), appId, appInfo.getAppSecret(), false, oAuthResponse);
 
                 break;
             case CLIENT_CREDENTIALS:
@@ -225,7 +210,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 // 客户端凭证许可：grant_type，app_id，app_secret必填，scope选填
                 String appSecret = appInfo.getAppSecret();
                 if (!Objects.equals(appSecret, oAuthRequest.getAppSecret())) {
-                    throw new InconsistentDataException("app_id或app_secret错误");
+                    throw new BusinessException("app_id或app_secret错误");
                 }
                 doGenerateTokens(grantTypeEnum, null, null, appId, appInfo.getAppSecret(), false, oAuthResponse);
 
@@ -240,6 +225,9 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 }
 
                 ssoId = JwtUtil.getSubjectId(refreshToken);
+                if (!StringUtil.hasText(ssoId)) {
+                    throw new BaseException(Hint.AUTHENTICATION_FAILED, "非法的刷新令牌");
+                }
                 UserThings userThingsBySsoId = userThingsMapper.selectOne(UserThings.builder().id(Long.valueOf(ssoId)).build());
                 try {
                     JwtUtil.verify(refreshToken,ssoId, userThingsBySsoId.getPassword());
@@ -260,7 +248,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 
                 break;
             default:
-                throw new UnsupportedParamType("不支持的授权类型：" + grantTypeEnum.value());
+                throw new ParamValidateException("不支持的授权类型：" + grantTypeEnum.value());
         }
 
         return oAuthResponse;
@@ -397,6 +385,13 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                                   boolean ignoreGenerateRefreshToken,
                                   OAuthResponse oAuthResponse) {
 
+        if (StringUtils.isEmpty(resourceOwnerId)) {
+            resourceOwnerId = appId;
+        }
+        if (StringUtils.isEmpty(resourceOwnerSecret)) {
+            resourceOwnerSecret = appSecret;
+        }
+
         // 查询客户端的权限范围
         AppInfo appInfo = appInfoMapper.selectOne(AppInfo.builder().appId(appId).build());
         List<String> bindScopes = appInfo.getBindScopes();
@@ -430,19 +425,11 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         // 设置有效时间戳(10min内有效)
         // 绑定用户id，appId和有效时间
         simpleRedisUtil.set(
-                SystemConstants.AUTHORIZE_CODE_PREFIX + code,
+                GlobalConstants.AUTHORIZE_CODE_PREFIX + code,
                 currUserId + ":" + appId,
-                SystemConstants.CODE_EXPIRE_TIME * 60
+                GlobalConstants.CODE_EXPIRE_TIME * 60
         );
 
         return code;
-    }
-
-    /**
-     * 清除session中的登录信息
-     */
-    private void clearLoginInfoInSession() {
-        ShiroSessionUtils.removeAttribute(SystemConstants.LOGIN_ERROR_RESPONSE);
-        ShiroSessionUtils.removeAttribute(SystemConstants.CURRENT_LOGIN_USER);
     }
 }
