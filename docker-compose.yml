@@ -7,7 +7,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
     networks:
-      dev:
+      qa:
         ipv4_address: 172.60.0.2
     volumes:
       - nginx:/etc/nginx
@@ -26,7 +26,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
     networks:
-      dev:
+      qa:
         ipv4_address: 172.60.1.1
     volumes:
       - web1log:/log
@@ -39,7 +39,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
     networks:
-      dev:
+      qa:
         ipv4_address: 172.60.1.2
     volumes:
       - web2log:/log
@@ -55,7 +55,7 @@ services:
       - MYSQL_PASSWORD=wzj123456
       - TZ=Asia/Shanghai
     networks:
-      dev:
+      qa:
         ipv4_address: 172.60.2.1
     volumes:
       - mysqlconf:/etc/mysql
@@ -64,20 +64,80 @@ services:
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci
       --explicit_defaults_for_timestamp=true
-  redis:
+  redis.c1:
     image: redis:5.0.14
-    container_name: uacs_redis5
+    container_name: uacs_redis_c1
     environment:
       - TZ=Asia/Shanghai
     networks:
-      dev:
+      qa:
         ipv4_address: 172.60.3.1
-    command: redis-server --requirepass root
+    command: redis-server /etc/redis/redis.conf
     volumes:
-      - redis:/usr/local/etc/redis
-
+      - redisc1conf:/etc/redis
+      - redisc1data:/data
+  redis.c2:
+    image: redis:5.0.14
+    container_name: uacs_redis_c2
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      qa:
+        ipv4_address: 172.60.3.2
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - redisc2conf:/etc/redis
+      - redisc2data:/data
+  redis.c3:
+    image: redis:5.0.14
+    container_name: uacs_redis_c3
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      qa:
+        ipv4_address: 172.60.3.3
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - redisc3conf:/etc/redis
+      - redisc3data:/data
+  redis.c4:
+    image: redis:5.0.14
+    container_name: uacs_redis_c4
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      qa:
+        ipv4_address: 172.60.3.4
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - redisc4conf:/etc/redis
+      - redisc4data:/data
+  redis.c5:
+    image: redis:5.0.14
+    container_name: uacs_redis_c5
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      qa:
+        ipv4_address: 172.60.3.5
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - redisc5conf:/etc/redis
+      - redisc5data:/data
+  redis.c6:
+    image: redis:5.0.14
+    container_name: uacs_redis_c6
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      qa:
+        ipv4_address: 172.60.3.6
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - redisc6conf:/etc/redis
+      - redisc6data:/data
 networks:
-  dev:
+  qa:
     ipam:
       config:
         - subnet: 172.60.0.0/16
@@ -88,4 +148,15 @@ volumes:
   web2log:
   mysqlconf:
   mysqldata:
-  redis:
+  redisc1conf:
+  redisc1data:
+  redisc2conf:
+  redisc2data:
+  redisc3conf:
+  redisc3data:
+  redisc4conf:
+  redisc4data:
+  redisc5conf:
+  redisc5data:
+  redisc6conf:
+  redisc6data:

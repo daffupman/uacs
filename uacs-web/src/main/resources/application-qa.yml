@@ -15,6 +15,6 @@ spring:
       max-lifetime: 1800000
       connection-test-query: SELECT 1
   redis:
-    host: 172.60.3.1
-    port: 6379
     password: root
+    cluster:
+      nodes: 172.60.3.1:6379,172.60.3.2:6379,172.60.3.3:6379,172.60.3.4:6379,172.60.3.5:6379,172.60.3.6:6379
