@@ -1,0 +1,91 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:1.23.3-alpine
+    container_name: uacs_nginx
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      dev:
+        ipv4_address: 172.60.0.2
+    volumes:
+      - nginx:/etc/nginx
+    ports:
+      - 80:80
+    depends_on:
+      - web
+      - mysql
+      - redis
+  web1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wangzhengjin/uacs-web:1.1
+    container_name: uacs_web1
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      dev:
+        ipv4_address: 172.60.1.1
+    volumes:
+      - web1log:/log
+    depends_on:
+      - mysql
+      - redis
+  web2:
+    image: wangzhengjin/uacs-web:1.1
+    container_name: uacs_web2
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      dev:
+        ipv4_address: 172.60.1.2
+    volumes:
+      - web2log:/log
+    depends_on:
+      - mysql
+      - redis
+  mysql:
+    image: mysql:8.0
+    container_name: uacs_mysql8
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=wangzhengjin
+      - MYSQL_PASSWORD=wzj123456
+      - TZ=Asia/Shanghai
+    networks:
+      dev:
+        ipv4_address: 172.60.2.1
+    volumes:
+      - mysqlconf:/etc/mysql
+      - mysqldata:/var/lib/mysql
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+  redis:
+    image: redis:5.0.14
+    container_name: uacs_redis5
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      dev:
+        ipv4_address: 172.60.3.1
+    command: redis-server --requirepass root
+    volumes:
+      - redis:/usr/local/etc/redis
+
+networks:
+  dev:
+    ipam:
+      config:
+        - subnet: 172.60.0.0/16
+
+volumes:
+  nginx:
+  web1log:
+  web2log:
+  mysqlconf:
+  mysqldata:
+  redis:
