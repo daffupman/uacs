@@ -19,7 +19,7 @@ services:
       - redis
   web1:
     build:
-      context: .
+      context: uacs-web
       dockerfile: Dockerfile
     image: wangzhengjin/uacs-web:1.1
     container_name: uacs_web1
@@ -43,6 +43,35 @@ services:
         ipv4_address: 172.60.1.2
     volumes:
       - web2log:/log
+    depends_on:
+      - mysql
+      - redis
+  cms1:
+    build:
+      context: uacs-cms
+      dockerfile: Dockerfile
+    image: wangzhengjin/uacs-cms:1.1
+    container_name: uacs_cms1
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      qa:
+        ipv4_address: 172.60.1.3
+    volumes:
+      - cms1log:/log
+    depends_on:
+      - mysql
+      - redis
+  cms2:
+    image: wangzhengjin/uacs-cms:1.1
+    container_name: uacs_cms2
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      qa:
+        ipv4_address: 172.60.1.4
+    volumes:
+      - cms2log:/log
     depends_on:
       - mysql
       - redis
@@ -146,6 +175,8 @@ volumes:
   nginx:
   web1log:
   web2log:
+  cms1log:
+  cms2log:
   mysqlconf:
   mysqldata:
   redisc1conf:

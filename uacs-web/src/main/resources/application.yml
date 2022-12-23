@@ -6,7 +6,7 @@ spring:
 server:
   port: 20011
   servlet:
-    context-path: /uacs
+    context-path: /uacsweb
 mybatis:
   mapper-locations: classpath:/mapper/*.xml
   configuration:
