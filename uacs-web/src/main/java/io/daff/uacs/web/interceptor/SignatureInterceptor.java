@@ -1,9 +1,6 @@
 package io.daff.uacs.web.interceptor;
 
-import io.daff.uacs.service.entity.req.sign.Signature;
-import io.daff.uacs.service.entity.req.sign.secret.SecretStorage;
-import io.daff.uacs.service.service.cache.UacsBizDataLoader;
-import io.daff.web.exception.ParamValidateException;
+import io.daff.uacs.service.entity.req.sign.ApiAccessAuthenticator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -26,7 +23,7 @@ import java.util.Map;
 public class SignatureInterceptor extends HandlerInterceptorAdapter {
 
     @Resource
-    private SecretStorage secretStorage;
+    private ApiAccessAuthenticator apiAccessAuthenticator;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -35,30 +32,12 @@ public class SignatureInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
 
-        // 生成签名对象
-        Signature signature = new Signature().build(request);
-
-        // 调试模式
-        if (signature.isDebug()) {
-            return true;
-        }
-
-        // 重放攻击验证
-        if (signature.replay()) {
-            throw new ParamValidateException("接口调用已过期");
-        }
-
-        String secret = secretStorage.getSecretByAppId(signature.getAppId());
-        if (secret == null) {
-            throw new ParamValidateException("无效的app_id");
-        }
-
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         Parameter[] parameters = handlerMethod.getMethod().getParameters();
         Map<String, Object> params = flatParams(parameters);
-        if (!signature.verify(params, secret)) {
-            throw new ParamValidateException("签名验证错误");
-        }
+
+        // 验证
+        apiAccessAuthenticator.auth(request, params);
 
         return true;
     }
