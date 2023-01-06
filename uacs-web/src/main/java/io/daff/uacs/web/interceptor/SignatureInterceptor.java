@@ -1,6 +1,7 @@
 package io.daff.uacs.web.interceptor;
 
-import io.daff.uacs.service.entity.req.base.Signature;
+import io.daff.uacs.service.entity.req.sign.Signature;
+import io.daff.uacs.service.entity.req.sign.secret.SecretStorage;
 import io.daff.uacs.service.service.cache.UacsBizDataLoader;
 import io.daff.web.exception.ParamValidateException;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 接口验签
+ * 接口验签拦截器
  *
  * @author daffupman
  * @since 2021/11/15
@@ -25,7 +26,7 @@ import java.util.Map;
 public class SignatureInterceptor extends HandlerInterceptorAdapter {
 
     @Resource
-    private UacsBizDataLoader uacsBizDataLoader;
+    private SecretStorage secretStorage;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -34,30 +35,31 @@ public class SignatureInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
 
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        Parameter[] parameters = handlerMethod.getMethod().getParameters();
-
-        // 验签
-        Map<String, Object> params = flatParams(parameters);
+        // 生成签名对象
         Signature signature = new Signature().build(request);
 
+        // 调试模式
         if (signature.isDebug()) {
             return true;
         }
 
-        String secret = uacsBizDataLoader.getAppSecretById(signature.getAppId());
+        // 重放攻击验证
+        if (signature.replay()) {
+            throw new ParamValidateException("接口调用已过期");
+        }
+
+        String secret = secretStorage.getSecretByAppId(signature.getAppId());
         if (secret == null) {
             throw new ParamValidateException("无效的app_id");
         }
+
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Parameter[] parameters = handlerMethod.getMethod().getParameters();
+        Map<String, Object> params = flatParams(parameters);
         if (!signature.verify(params, secret)) {
             throw new ParamValidateException("签名验证错误");
         }
-        // 重放攻击验证
-        Long timestamp = signature.getTimestamp();
 
-        if (System.currentTimeMillis() - timestamp > 1000 * 60 * 500) {
-            throw new ParamValidateException("接口调用已过期");
-        }
         return true;
     }
 

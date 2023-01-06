@@ -1,5 +1,6 @@
 package io.daff.uacs.service.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -16,6 +17,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class SimpleRedisUtil {
+
+    @Value("${spring.application.name}")
+    private String KEY_PREFIX;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -34,6 +38,7 @@ public class SimpleRedisUtil {
         if (StringUtils.isEmpty(key) || StringUtils.isEmpty(value)) {
             return;
         }
+        key = getKeyPrefix() + key;
         if (ttl > 0) {
             stringRedisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
         } else {
@@ -48,7 +53,7 @@ public class SimpleRedisUtil {
         if (StringUtils.isEmpty(key)) {
             return null;
         }
-        return stringRedisTemplate.opsForValue().get(key);
+        return stringRedisTemplate.opsForValue().get(getKeyPrefix() + key);
     }
 
     /**
@@ -56,14 +61,14 @@ public class SimpleRedisUtil {
      */
     public void delete(List<String> keys) {
         if (StringUtils.isEmpty(keys)) { return; }
-        stringRedisTemplate.delete(keys);
+        stringRedisTemplate.delete(getKeyPrefix() + keys);
     }
 
     /**
      * 按key删除值
      */
     public void delete(String key) {
-        if (StringUtils.isEmpty(key)) { return; }
+        if (StringUtils.isEmpty(getKeyPrefix() + key)) { return; }
         stringRedisTemplate.delete(key);
     }
 
@@ -72,6 +77,10 @@ public class SimpleRedisUtil {
      */
     public Boolean exist(String key) {
         if (StringUtils.isEmpty(key)) { return false; }
-        return stringRedisTemplate.hasKey(key);
+        return stringRedisTemplate.hasKey(getKeyPrefix() + key);
+    }
+
+    private String getKeyPrefix() {
+        return KEY_PREFIX + ":";
     }
 }

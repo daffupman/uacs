@@ -1,4 +1,4 @@
-package io.daff.uacs.service.entity.req.base;
+package io.daff.uacs.service.entity.req.sign;
 
 import io.daff.uacs.service.util.Md5Util;
 import io.daff.web.exception.ParamValidateException;
@@ -27,6 +27,7 @@ public class Signature {
     private static final String HEADER_TIMESTAMP = "timestamp";
     private static final String HEADER_SIGNATURE = "signature";
     private static final String HEADER_DEBUG = "debug";
+    private static final Integer DEFAULT_CALL_INTERVAL = 1000 * 60 * 500;
 
     public Signature build(HttpServletRequest request) {
         if (request == null) {
@@ -58,6 +59,9 @@ public class Signature {
         return this;
     }
 
+    /**
+     * 验签
+     */
     public boolean verify(Map<String, Object> params, String secret) {
         params = sort(params);
         params.put(HEADER_APP_ID, this.appId);
@@ -66,6 +70,28 @@ public class Signature {
         return Objects.equals(this.signature, signature);
     }
 
+    /**
+     * 验证重放攻击
+     */
+    public boolean replay() {
+        return System.currentTimeMillis() - timestamp > DEFAULT_CALL_INTERVAL;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public Boolean isDebug() {
+        return debug;
+    }
+
+    /**
+     * 签名规则：Md5({k1=v1#k2=v2}secret)
+     *
+     * @param params 接口入参
+     * @param secret 密钥
+     * @return 签名串
+     */
     private String sign(Map<String, Object> params, String secret) {
         StringBuilder sb = new StringBuilder("{");
         for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -83,17 +109,5 @@ public class Signature {
         TreeMap<String, Object> map = new TreeMap<>(Comparator.naturalOrder());
         map.putAll(params);
         return map;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public Boolean isDebug() {
-        return debug;
     }
 }

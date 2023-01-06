@@ -17,6 +17,7 @@ import io.daff.uacs.service.entity.resp.OAuthResponse;
 import io.daff.uacs.service.entity.resp.UserProfileResponse;
 import io.daff.uacs.service.mapper.AppInfoMapper;
 import io.daff.uacs.service.mapper.UserThingsMapper;
+import io.daff.uacs.service.service.CacheService;
 import io.daff.uacs.service.service.OAuth2Service;
 import io.daff.uacs.service.util.JacksonUtil;
 import io.daff.uacs.service.util.JwtUtil;
@@ -50,6 +51,8 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     private AppInfoMapper appInfoMapper;
     @Resource
     private SimpleRedisUtil simpleRedisUtil;
+    @Resource
+    private CacheService cacheService;
 
     private static final String ACCESS_TOKEN_REDIS_PREFIX = "access_token:";
     private static final String REFRESH_TOKEN_REDIS_PREFIX = "refresh_token:";
@@ -298,14 +301,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         if (userThings == null || !userThings.getStatus().equals(Byte.valueOf("1"))) {
             throw new NoSuchDataException("用户不存在或状态异常");
         }
-        if (!JwtUtil.isExpired(accessToken)) {
-            String accessTokenFromRedis = simpleRedisUtil.get(ACCESS_TOKEN_REDIS_PREFIX + ssoId);
-            if (StringUtils.isEmpty(accessTokenFromRedis) || !accessTokenFromRedis.equals(accessToken)) {
-                throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
-            }
-        } else {
-            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
-        }
+        assureValidToken(accessToken, ssoId);
 
         try {
             JwtUtil.verify(accessToken, ssoId, userThings.getPassword());
@@ -322,22 +318,14 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         if (StringUtils.isEmpty(ssoId)) {
             throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "无效的访问令牌");
         }
-        if (!JwtUtil.isExpired(accessToken)) {
-            String accessTokenFromRedis = simpleRedisUtil.get(ACCESS_TOKEN_REDIS_PREFIX + ssoId);
-            if (StringUtils.isEmpty(accessTokenFromRedis) || !accessTokenFromRedis.equals(accessToken)) {
-                throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
-            }
-        } else {
-            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
-        }
+        assureValidToken(accessToken, ssoId);
 
         String subjectId = JwtUtil.getSubjectId(accessToken);
         if (!String.valueOf(userProfileRequest.getUserId()).equals(subjectId)) {
             throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "用户与访问令牌不一致");
         }
 
-        UserThings userThings = userThingsMapper.selectById(userProfileRequest.getUserId());
-        return UserProfileResponse.of(userThings);
+        return UserProfileResponse.of(cacheService.getUserThings(userProfileRequest.getUserId()));
     }
 
     @Override
@@ -431,5 +419,19 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         );
 
         return code;
+    }
+
+    /**
+     * 验证访问令牌有效期
+     */
+    private void assureValidToken(String accessToken, String ssoId) {
+        if (!JwtUtil.isExpired(accessToken)) {
+            String accessTokenFromRedis = simpleRedisUtil.get(ACCESS_TOKEN_REDIS_PREFIX + ssoId);
+            if (StringUtils.isEmpty(accessTokenFromRedis) || !accessTokenFromRedis.equals(accessToken)) {
+                throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
+            }
+        } else {
+            throw new BaseException(Hint.PARAM_VALIDATE_ERROR, "过期的访问令牌");
+        }
     }
 }

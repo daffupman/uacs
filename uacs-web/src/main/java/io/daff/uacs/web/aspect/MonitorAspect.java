@@ -1,5 +1,6 @@
 package io.daff.uacs.web.aspect;
 
+import com.google.common.collect.Lists;
 import io.daff.logging.DaffLogger;
 import io.daff.uacs.core.enums.BaseModule;
 import io.daff.uacs.core.util.IdUtil;
@@ -29,6 +30,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
@@ -119,6 +121,10 @@ public class MonitorAspect {
                 //在生产级代码中，我们应考虑使用类似Micrometer的指标框架，把打点信息记录到时间序列数据库中，实现通过图表来查看方法的调用次数和执行时间，在设计篇我们会重点介绍
                 log.info("【接口::耗时】【{}】调用成功：{} ms", BaseModule.MONITOR, name, Duration.between(start, Instant.now()).toMillis());
             }
+            //实现了返回值的日志输出
+            if (monitor.recordReturnValue()) {
+                log.info("【接口::出参】【{}】：【{}】", BaseModule.MONITOR, name, JacksonUtil.beanToString(returnValue));
+            }
         } catch (Exception e) {
             if (monitor.recordExecuteFailureTimeCost()) {
                 log.info("【接口::耗时】【{}】调用失败：%d ms", BaseModule.MONITOR, name, Duration.between(start, Instant.now()).toMillis());
@@ -134,12 +140,9 @@ public class MonitorAspect {
             //     throw e;
             // }
             throw e;
+        } finally {
+            IpRequestContext.remove();
         }
-        //实现了返回值的日志输出
-        if (monitor.recordReturnValue()) {
-            log.info("【接口::出参】【{}】：【{}】", BaseModule.MONITOR, name, JacksonUtil.beanToString(returnValue));
-        }
-        IpRequestContext.remove();
         return returnValue;
     }
 

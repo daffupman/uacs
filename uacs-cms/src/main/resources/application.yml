@@ -2,7 +2,7 @@ spring:
   application:
     name: uacs-cms
   profiles:
-    active: dev
+    active: local
 server:
   port: 20010
   servlet:
