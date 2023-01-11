@@ -1,4 +1,4 @@
-package io.daff.uacs.service.entity.req.sign.secret;
+package io.daff.uacs.web.interceptor.sign.secret;
 
 import io.daff.uacs.service.service.cache.UacsBizDataLoader;
 import io.daff.utils.common.StringUtil;

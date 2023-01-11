@@ -1,4 +1,4 @@
-package io.daff.uacs.service.entity.req.sign.secret;
+package io.daff.uacs.web.interceptor.sign.secret;
 
 /**
  * 密钥存储器

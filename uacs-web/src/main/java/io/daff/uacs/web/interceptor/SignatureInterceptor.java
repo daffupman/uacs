@@ -1,6 +1,6 @@
 package io.daff.uacs.web.interceptor;
 
-import io.daff.uacs.service.entity.req.sign.ApiAccessAuthenticator;
+import io.daff.uacs.web.interceptor.sign.ApiAccessAuthenticator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;

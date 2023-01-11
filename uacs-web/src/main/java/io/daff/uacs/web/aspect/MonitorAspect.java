@@ -1,9 +1,7 @@
 package io.daff.uacs.web.aspect;
 
-import com.google.common.collect.Lists;
 import io.daff.logging.DaffLogger;
 import io.daff.uacs.core.enums.BaseModule;
-import io.daff.uacs.core.util.IdUtil;
 import io.daff.uacs.service.util.JacksonUtil;
 import io.daff.uacs.web.anno.Monitor;
 import io.daff.uacs.web.context.IpRequestContext;
@@ -12,7 +10,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.InputStreamSource;
@@ -30,7 +27,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
@@ -47,11 +43,6 @@ import static java.util.stream.Collectors.toMap;
 public class MonitorAspect {
 
     private static final DaffLogger log = DaffLogger.getLogger(MonitorAspect.class);
-
-    @Resource
-    private HttpServletRequest request;
-    @Resource
-    private IdUtil idUtil;
 
     //实现一个返回Java基本类型默认值的工具。其实，你也可以逐一写很多if-else判断类型，然后手动设置其默认值。这里为了减少代码量用了一个小技巧，即通过初始化一个具有1个元素的数组，然后通过获取这个数组的值来获取基本类型默认值
     private static final Map<Class<?>, Object> DEFAULT_VALUES = Stream.of(
@@ -78,11 +69,6 @@ public class MonitorAspect {
     public Object metrics(ProceedingJoinPoint pjp) throws Throwable {
 
         Instant start = Instant.now();
-
-        // 设置远程ip
-        IpRequestContext.set(getRemoteIp(request));
-        // 设置MDC
-        MDC.put("traceId", idUtil.nextId().toString());
 
         //通过连接点获取方法签名和方法上Metrics注解，并根据方法签名生成日志中要输出的方法定义描述
         MethodSignature signature = (MethodSignature) pjp.getSignature();
@@ -144,23 +130,6 @@ public class MonitorAspect {
             IpRequestContext.remove();
         }
         return returnValue;
-    }
-
-    /**
-     * 使用nginx做反向代理，需要用该方法才能取到真实的远程IP
-     */
-    private String getRemoteIp(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
     }
 
     /**

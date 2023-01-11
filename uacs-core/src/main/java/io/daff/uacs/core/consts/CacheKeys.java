@@ -6,7 +6,7 @@ package io.daff.uacs.core.consts;
  * @author daff
  * @since 2022/12/25
  */
-public interface UacsCacheKeys {
+public interface CacheKeys {
 
     /**
      * 用户基本信息。userprofile:{userId}

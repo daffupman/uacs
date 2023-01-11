@@ -6,7 +6,7 @@ package io.daff.uacs.core.consts;
  * @author daff
  * @since 2022/12/25
  */
-public interface UacsCacheTtls {
+public interface CacheTtls {
 
     Long MIN_1 = 600L;
     Long HOUR_1 = 3600L;

@@ -1,7 +1,7 @@
 package io.daff.uacs.service.service;
 
-import io.daff.uacs.core.consts.UacsCacheKeys;
-import io.daff.uacs.core.consts.UacsCacheTtls;
+import io.daff.uacs.core.consts.CacheKeys;
+import io.daff.uacs.core.consts.CacheTtls;
 import io.daff.uacs.service.entity.po.UserThings;
 import io.daff.uacs.service.mapper.UserThingsMapper;
 import io.daff.uacs.service.util.JacksonUtil;
@@ -30,13 +30,13 @@ public class CacheService {
 
         UserThings userThings;
 
-        String cacheKey = String.format(UacsCacheKeys.USER_PROFILE_PREFIX, userId);
+        String cacheKey = String.format(CacheKeys.USER_PROFILE_PREFIX, userId);
         String cached = simpleRedisUtil.get(cacheKey);
         if (StringUtil.hasText(cached)) {
             return JacksonUtil.stringToBean(cached, UserThings.class);
         } else {
             userThings = userThingsMapper.selectById(userId);
-            simpleRedisUtil.set(cacheKey, JacksonUtil.beanToString(userThings), UacsCacheTtls.DAY_1);
+            simpleRedisUtil.set(cacheKey, JacksonUtil.beanToString(userThings), CacheTtls.DAY_1);
         }
         return userThings;
     }

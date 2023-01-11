@@ -1,4 +1,4 @@
-package io.daff.uacs.service.entity.req.sign;
+package io.daff.uacs.web.interceptor.sign;
 
 import io.daff.uacs.service.util.Md5Util;
 import io.daff.web.exception.ParamValidateException;
@@ -86,7 +86,7 @@ public class Signature {
     }
 
     /**
-     * 签名规则：Md5({k1=v1#k2=v2}secret)
+     * 生成签名字符串。签名规则：Md5({k1=v1#k2=v2}secret)
      *
      * @param params 接口入参
      * @param secret 密钥

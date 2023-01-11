@@ -1,4 +1,4 @@
-package io.daff.uacs.service.entity.req.sign;
+package io.daff.uacs.web.interceptor.sign;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;

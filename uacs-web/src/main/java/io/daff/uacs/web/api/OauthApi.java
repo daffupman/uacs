@@ -10,12 +10,12 @@ import io.daff.uacs.service.service.OAuth2Service;
 import io.daff.uacs.web.anno.AccessLimiter;
 import io.daff.uacs.web.anno.ApiVersion;
 import io.daff.web.entity.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 @ApiVersion("v1")
 public class OauthApi {
 
-    @Autowired
+    @Resource
     private OAuth2Service oAuth2Service;
 
     @PostMapping("/token")
