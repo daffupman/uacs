@@ -44,7 +44,7 @@ public class DefaultApiAccessAuthenticator implements ApiAccessAuthenticator {
 
         // 验签
         if (!signature.verify(params, secret)) {
-            throw new ParamValidateException("签名验证错误");
+            throw new ParamValidateException("签名不合法");
         }
     }
 }

@@ -66,6 +66,11 @@
       <artifactId>valid</artifactId>
       <version>1.0.0</version>
     </dependency>
+    <dependency>
+      <groupId>io.daff</groupId>
+      <artifactId>cache</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
 
 </project>

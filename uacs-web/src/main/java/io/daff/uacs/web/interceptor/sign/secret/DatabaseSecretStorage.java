@@ -2,6 +2,8 @@ package io.daff.uacs.web.interceptor.sign.secret;
 
 import io.daff.uacs.service.service.cache.UacsBizDataLoader;
 import io.daff.utils.common.StringUtil;
+import io.daff.web.enums.Hint;
+import io.daff.web.exception.BaseException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -20,6 +22,9 @@ public class DatabaseSecretStorage implements SecretStorage {
 
     @Override
     public String getSecretByAppId(String appId) {
+        if (!uacsBizDataLoader.finish()) {
+            throw new BaseException(Hint.DATA_UNAVAILABLE, "数据还未加载完成，请稍后重试");
+        }
         return StringUtil.hasText(appId) ? uacsBizDataLoader.getAppSecretById(appId) : null;
     }
 }

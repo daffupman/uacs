@@ -18,7 +18,6 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -104,8 +103,8 @@ public class MonitorAspect {
         try {
             returnValue = pjp.proceed();
             if (monitor.recordExecuteSuccessTimeCost()) {
-                //在生产级代码中，我们应考虑使用类似Micrometer的指标框架，把打点信息记录到时间序列数据库中，实现通过图表来查看方法的调用次数和执行时间，在设计篇我们会重点介绍
-                log.info("【接口::耗时】【{}】调用成功：{} ms", BaseModule.MONITOR, name, Duration.between(start, Instant.now()).toMillis());
+                //在生产级代码中，我们应考虑使用类似Micrometer的指标框架，把打点信息记录到时间序列数据库中，实现通过图表来查看方法的调用次数和执行时间
+                log.info("【接口::耗时】【{}】：【调用成功：{} ms】", BaseModule.MONITOR, name, Duration.between(start, Instant.now()).toMillis());
             }
             //实现了返回值的日志输出
             if (monitor.recordReturnValue()) {

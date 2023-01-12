@@ -1,5 +1,6 @@
 package io.daff.uacs.service.service.cache;
 
+import io.daff.cache.BizDataLoader;
 import io.daff.logging.DaffLogger;
 import io.daff.logging.module.InnerModule;
 import io.daff.uacs.service.entity.po.Client;
@@ -28,6 +29,7 @@ public class UacsBizDataLoader implements BizDataLoader {
     private ClientMapper clientMapper;
 
     private Map<String, Client> clientCache = new ConcurrentHashMap<>();
+    private boolean clientLoadFinished;
 
     public String getAppSecretById(String appId) {
         return clientCache.get(appId) == null ? null : clientCache.get(appId).getAppSecret();
@@ -40,7 +42,13 @@ public class UacsBizDataLoader implements BizDataLoader {
             List<Client> clientList = clientMapper.selectAll();
             clientCache = clientList.stream().collect(Collectors.toMap(Client::getAppId, client -> client));
             log.info("local data => client load success!", InnerModule.CACHE);
+            clientLoadFinished = true;
         }, 0L, 10, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public boolean finish() {
+        return clientLoadFinished;
     }
 
 }
