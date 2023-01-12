@@ -1,6 +1,6 @@
 package io.daff.uacs.web.interceptor.sign.secret;
 
-import io.daff.uacs.service.service.cache.UacsBizDataLoader;
+import io.daff.uacs.service.service.load.UacsBizDataLoader;
 import io.daff.utils.common.StringUtil;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.BaseException;

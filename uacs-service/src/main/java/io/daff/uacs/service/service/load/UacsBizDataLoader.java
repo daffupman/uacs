@@ -1,4 +1,4 @@
-package io.daff.uacs.service.service.cache;
+package io.daff.uacs.service.service.load;
 
 import io.daff.cache.BizDataLoader;
 import io.daff.logging.DaffLogger;

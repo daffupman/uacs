@@ -1,6 +1,7 @@
 package io.daff.uacs.web;
 
 import io.daff.cache.BizDataLoader;
+import io.daff.cache.PreCacheDataExecutor;
 import io.daff.logging.DaffLogger;
 import io.daff.logging.module.InnerModule;
 import io.daff.uacs.service.config.thread.DefaultUncaughtExceptionHandler;
@@ -11,7 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.Resource;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author daff
@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class UacsWebApplication implements CommandLineRunner {
 
     private static final DaffLogger logger = DaffLogger.getLogger(UacsWebApplication.class);
+
     @Resource
     private BizDataLoader bizDataLoader;
 
@@ -37,10 +38,7 @@ public class UacsWebApplication implements CommandLineRunner {
 
         // 数据加载
         if (bizDataLoader != null) {
-            bizDataLoader.load();
-            while (!bizDataLoader.finish()) {
-                TimeUnit.SECONDS.sleep(1);
-            }
+            new PreCacheDataExecutor(bizDataLoader).exec();
             logger.info("uacs cache data load success!", InnerModule.CACHE);
         }
     }
