@@ -1,5 +1,6 @@
 package io.daff.uacs.web;
 
+import io.daff.uacs.service.config.thread.DefaultUncaughtExceptionHandler;
 import io.daff.uacs.service.service.cache.BizDataLoader;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.CommandLineRunner;
@@ -29,8 +30,12 @@ public class UacsWebApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // 数据加载
         if (!CollectionUtils.isEmpty(bizDataLoaders)) {
             bizDataLoaders.forEach(BizDataLoader::load);
         }
+
+        // 设置线程的全局异常处理器
+        Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
     }
 }

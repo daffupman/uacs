@@ -14,6 +14,7 @@ public enum BaseModule implements Module {
     AUTHC(21, "DAFF.AUTHC"),
     PAGE(22, "DAFF.PAGE"),
     ERROR(23, "DAFF.ERROR"),
+    THREAD(24, "DAFF.THREAD")
     ;
 
     private final Integer no;

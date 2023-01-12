@@ -1,13 +1,13 @@
 package io.daff.uacs.cms.service.impl;
 
 import com.github.pagehelper.PageInfo;
+import io.daff.uacs.cms.entity.req.UserThingsRequest;
+import io.daff.uacs.cms.entity.req.UserThingsSortableQueryRequest;
+import io.daff.uacs.cms.entity.resp.UserThingsResponse;
 import io.daff.uacs.cms.service.UserThingsService;
 import io.daff.uacs.cms.util.PageUtil;
 import io.daff.uacs.core.util.IdUtil;
 import io.daff.uacs.service.entity.po.UserThings;
-import io.daff.uacs.cms.entity.req.UserThingsSortableQueryRequest;
-import io.daff.uacs.cms.entity.req.UserThingsRequest;
-import io.daff.uacs.cms.entity.resp.UserThingsResponse;
 import io.daff.uacs.service.entity.resp.base.Page;
 import io.daff.uacs.service.mapper.UserThingsMapper;
 import io.daff.utils.crypto.StrongCryptoUtil;
@@ -50,7 +50,7 @@ public class UserThingsServiceImpl implements UserThingsService {
             effectRows = userThingsMapper.update(putUserThings);
         } else {
             // 新增
-            putUserThings.setId(idUtil.nextId());
+            putUserThings.setId(idUtil.nextDistributeId());
             putUserThings.setName(userThingsRequest.getName());
             putUserThings.setMobilePhoneNo(userThingsRequest.getMobilePhoneNo());
             putUserThings.setEmail(userThingsRequest.getEmail());

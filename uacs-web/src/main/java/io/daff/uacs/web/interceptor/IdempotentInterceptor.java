@@ -57,6 +57,16 @@ public class IdempotentInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        if (!(handler instanceof HandlerMethod)) {
+            return;
+        }
+
+        Method method = ((HandlerMethod) handler).getMethod();
+        Idempotent idempotent = method.getAnnotation(Idempotent.class);
+        if (idempotent == null) {
+            return;
+        }
+
         simpleRedisUtil.delete(idempotentCacheKeyThreadLocal.get());
         idempotentCacheKeyThreadLocal.remove();
     }

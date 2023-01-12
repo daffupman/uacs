@@ -27,7 +27,7 @@ public class TraceIdSetterInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String traceId = request.getHeader(AttrNames.TRACE_ID);
         if (!StringUtil.hasText(traceId)) {
-            traceId = idUtil.nextId().toString();
+            traceId = idUtil.nextTraceId();
         }
         // 设置MDC
         MDC.put(AttrNames.TRACE_ID, traceId);
