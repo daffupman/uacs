@@ -14,7 +14,7 @@
   <groupId>io.daff</groupId>
   <artifactId>uacs</artifactId>
   <packaging>pom</packaging>
-  <version>1.0</version>
+  <version>1.1</version>
 
   <modules>
     <module>uacs-core</module>
