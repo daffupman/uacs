@@ -2,6 +2,18 @@
 
 ## 使用docker启动项目注意事项
 
+### 使用docker-compose启动服务
+```shell
+# 创建并启动服务（后台）
+docker-compose up [-d]
+# 停止服务
+docker-compose stop
+# 启动服务
+docker-compose start
+# 停止并删除服务
+docker-compose down
+```
+
 ### 初始化nginx
 拷贝`nginx.conf`和`default.conf`到nginx容器中，替换原来的配置文件，重启nginx
 ```shell
@@ -27,12 +39,12 @@ source /tmp/uacs.sql;
 
 先把docker-compose里面的6个服务中的command改成 `redis-server --requirepass root`, 然后把redis的配置文件拷贝到容器内
 ```shell
-docker container cp redis.conf uacs_redis_c1:/etc/redis/redis.conf
-docker container cp redis.conf uacs_redis_c2:/etc/redis/redis.conf
-docker container cp redis.conf uacs_redis_c3:/etc/redis/redis.conf
-docker container cp redis.conf uacs_redis_c4:/etc/redis/redis.conf
-docker container cp redis.conf uacs_redis_c5:/etc/redis/redis.conf
-docker container cp redis.conf uacs_redis_c6:/etc/redis/redis.conf
+docker container cp doc/redis.conf uacs_redis_c1:/etc/redis/redis.conf
+docker container cp doc/redis.conf uacs_redis_c2:/etc/redis/redis.conf
+docker container cp doc/redis.conf uacs_redis_c3:/etc/redis/redis.conf
+docker container cp doc/redis.conf uacs_redis_c4:/etc/redis/redis.conf
+docker container cp doc/redis.conf uacs_redis_c5:/etc/redis/redis.conf
+docker container cp doc/redis.conf uacs_redis_c6:/etc/redis/redis.conf
 ```
 进入容器uacs_redis_c1，执行redis cluster初始化命令
 ```shell

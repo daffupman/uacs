@@ -14,7 +14,7 @@ public class DefaultUncaughtExceptionHandler implements Thread.UncaughtException
     private static final DaffLogger logger = DaffLogger.getLogger(DefaultUncaughtExceptionHandler.class);
 
     /**
-     * 日志记录
+     * 日志记录（但是获取不到ThreadLocal数据，根据实际情况决定是否使用该方式进行线程异常的统一捕获）
      * @param t 线程
      * @param e 异常
      */

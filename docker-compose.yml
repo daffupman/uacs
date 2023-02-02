@@ -14,10 +14,16 @@ services:
     ports:
       - 80:80
     depends_on:
-      - web
+      - uacs1
+      - uacs2
       - mysql
-      - redis
-  uacs:
+      - redis.c1
+      - redis.c2
+      - redis.c3
+      - redis.c4
+      - redis.c5
+      - redis.c6
+  uacs1:
     build:
       context: .
       dockerfile: Dockerfile
@@ -32,7 +38,12 @@ services:
       - uacs1log:/log
     depends_on:
       - mysql
-      - redis
+      - redis.c1
+      - redis.c2
+      - redis.c3
+      - redis.c4
+      - redis.c5
+      - redis.c6
   uacs2:
     image: wangzhengjin/uacs:1.1
     container_name: uacs2
@@ -45,7 +56,12 @@ services:
       - uacs2log:/log
     depends_on:
       - mysql
-      - redis
+      - redis.c1
+      - redis.c2
+      - redis.c3
+      - redis.c4
+      - redis.c5
+      - redis.c6
   mysql:
     image: mysql:8.0
     container_name: uacs_mysql8

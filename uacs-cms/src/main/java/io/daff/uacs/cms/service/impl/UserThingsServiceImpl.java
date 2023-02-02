@@ -13,6 +13,7 @@ import io.daff.uacs.service.mapper.UserThingsMapper;
 import io.daff.utils.crypto.StrongCryptoUtil;
 import io.daff.web.consts.GlobalConstants;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -31,6 +32,7 @@ public class UserThingsServiceImpl implements UserThingsService {
     @Resource
     private IdUtil idUtil;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Long saveOrUpdateUserThings(UserThingsRequest userThingsRequest) {
         // TODO：登录功能完成后补充
@@ -83,6 +85,7 @@ public class UserThingsServiceImpl implements UserThingsService {
         return Page.of(userThingsPageInfo.getTotal(), userThingsResponses);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean removeUserThings(Long userId) {
 

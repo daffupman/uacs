@@ -16,6 +16,7 @@ import io.daff.web.consts.GlobalConstants;
 import io.daff.web.enums.Hint;
 import io.daff.web.exception.BaseException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -39,6 +40,7 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private HttpServletRequest request;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public String saveOrUpdateRole(RoleRequest roleRequest) {
 
@@ -67,6 +69,7 @@ public class RoleServiceImpl implements RoleService {
         return effectRows > 0 ? putRole.getId() : null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean removeRole(String roleId) {
 

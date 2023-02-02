@@ -14,8 +14,6 @@ import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSource
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -38,14 +36,16 @@ public class ShiroConfig {
     private BaseService baseService;
     @Resource
     private StatelessDefaultSubjectFactory statelessDefaultSubjectFactory;
+    @Resource
+    private SimpleRedisUtil simpleRedisUtil;
 
     /**
      * shiro注解支持的bean
      */
     @Bean
-    public AuthorizationAttributeSourceAdvisor advisor(@Qualifier("defaultWebSecurityManager") DefaultWebSecurityManager securityManager) {
+    public AuthorizationAttributeSourceAdvisor advisor() {
         AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
-        advisor.setSecurityManager(securityManager);
+        advisor.setSecurityManager(defaultWebSecurityManager());
         return advisor;
     }
 
@@ -57,12 +57,9 @@ public class ShiroConfig {
     }
 
     @Bean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(
-            @Qualifier("defaultWebSecurityManager") DefaultWebSecurityManager securityManager
-    ) {
-
+    public ShiroFilterFactoryBean shiroFilterFactoryBean() {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-        shiroFilterFactoryBean.setSecurityManager(securityManager);
+        shiroFilterFactoryBean.setSecurityManager(defaultWebSecurityManager());
 
         // 配置自定义的过滤器
         Map<String, Filter> filters = new LinkedHashMap<>();
@@ -91,23 +88,15 @@ public class ShiroConfig {
         return shiroFilterFactoryBean;
     }
 
-    @Bean("defaultWebSecurityManager")
-    public DefaultWebSecurityManager defaultWebSecurityManager(
-            @Qualifier("usernameAndPasswordRealm") UsernameAndPasswordRealm usernameAndPasswordRealm,
-            @Qualifier("mobilePhoneRealm") MobilePhoneCodeRealm mobilePhoneCodeRealm,
-            @Qualifier("jwtTokenRealm") JwtTokenRealm jwtTokenRealm
-    ) {
+    @Bean
+    public DefaultWebSecurityManager defaultWebSecurityManager() {
 
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         // 设置DefaultWebSecurityManager
         SecurityUtils.setSecurityManager(securityManager);
         securityManager.setAuthenticator(acsModularRealmAuthenticator());
         // 设置realm
-        securityManager.setRealms(Arrays.asList(
-                usernameAndPasswordRealm,
-                mobilePhoneCodeRealm,
-                jwtTokenRealm
-        ));
+        securityManager.setRealms(Arrays.asList(usernameAndPasswordRealm(), mobilePhoneRealm(), jwtTokenRealm()));
 
         // 关闭session
         DefaultSessionStorageEvaluator evaluator = new DefaultSessionStorageEvaluator();
@@ -138,37 +127,28 @@ public class ShiroConfig {
         return new UacsModularRealmAuthenticator();
     }
 
-    @Bean("jwtTokenRealm")
-    public JwtTokenRealm jwtTokenRealm(
-            @Qualifier("multiTokenCredentialsMatcher") MultiTokenCredentialsMatcher multiTokenCredentialsMatcher
-    ) {
+    @Bean
+    public JwtTokenRealm jwtTokenRealm() {
         JwtTokenRealm realm = new JwtTokenRealm(baseService);
-        realm.setCredentialsMatcher(multiTokenCredentialsMatcher);
+        realm.setCredentialsMatcher(multiTokenCredentialsMatcher());
         return realm;
     }
 
-    @Bean("mobilePhoneRealm")
-    public MobilePhoneCodeRealm mobilePhoneRealm(
-            @Qualifier("multiTokenCredentialsMatcher") MultiTokenCredentialsMatcher multiTokenCredentialsMatcher
-    ) {
+    @Bean
+    public MobilePhoneCodeRealm mobilePhoneRealm() {
         MobilePhoneCodeRealm realm = new MobilePhoneCodeRealm(baseService);
-        realm.setCredentialsMatcher(multiTokenCredentialsMatcher);
+        realm.setCredentialsMatcher(multiTokenCredentialsMatcher());
         return realm;
     }
 
-    @Bean("usernameAndPasswordRealm")
-    public UsernameAndPasswordRealm usernameAndPasswordRealm(
-            @Qualifier("multiTokenCredentialsMatcher") MultiTokenCredentialsMatcher multiTokenCredentialsMatcher
-    ) {
-
+    @Bean
+    public UsernameAndPasswordRealm usernameAndPasswordRealm() {
         UsernameAndPasswordRealm realm = new UsernameAndPasswordRealm(baseService);
-        realm.setCredentialsMatcher(multiTokenCredentialsMatcher);
+        realm.setCredentialsMatcher(multiTokenCredentialsMatcher());
         return realm;
     }
 
-    @Autowired
-    private SimpleRedisUtil simpleRedisUtil;
-    @Bean("multiTokenCredentialsMatcher")
+    @Bean
     public MultiTokenCredentialsMatcher multiTokenCredentialsMatcher() {
         return new MultiTokenCredentialsMatcher(simpleRedisUtil);
     }
