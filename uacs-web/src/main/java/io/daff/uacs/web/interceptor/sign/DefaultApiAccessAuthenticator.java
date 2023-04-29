@@ -4,9 +4,6 @@ import io.daff.uacs.web.interceptor.sign.secret.SecretStorage;
 import io.daff.web.exception.ParamValidateException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
-
 /**
  * @author daff
  * @since 2023/1/6
@@ -21,10 +18,7 @@ public class DefaultApiAccessAuthenticator implements ApiAccessAuthenticator {
     }
 
     @Override
-    public void auth(HttpServletRequest request, Map<String, Object> params) {
-
-        // 生成签名对象
-        Signature signature = new Signature().build(request);
+    public void auth(Signature signature) {
 
         // 是否开启调试模式
         if (signature.isDebug()) {
@@ -43,7 +37,7 @@ public class DefaultApiAccessAuthenticator implements ApiAccessAuthenticator {
         }
 
         // 验签
-        if (!signature.verify(params, secret)) {
+        if (!signature.verify(secret)) {
             throw new ParamValidateException("签名不合法");
         }
     }

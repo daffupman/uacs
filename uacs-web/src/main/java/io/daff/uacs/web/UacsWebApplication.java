@@ -10,8 +10,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author daff
@@ -25,7 +27,7 @@ public class UacsWebApplication implements CommandLineRunner {
     private static final DaffLogger logger = DaffLogger.getLogger(UacsWebApplication.class);
 
     @Resource
-    private BizDataLoader bizDataLoader;
+    private List<BizDataLoader> bizDataLoaders;
 
     public static void main(String[] args) {
         SpringApplication.run(UacsWebApplication.class, args);
@@ -37,8 +39,8 @@ public class UacsWebApplication implements CommandLineRunner {
         Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
 
         // 数据加载
-        if (bizDataLoader != null) {
-            new PreCacheDataExecutor(bizDataLoader).exec();
+        if (!CollectionUtils.isEmpty(bizDataLoaders)) {
+            new PreCacheDataExecutor(bizDataLoaders).exec();
             logger.info("uacs cache data load success!", InnerModule.CACHE);
         }
     }

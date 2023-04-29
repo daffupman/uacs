@@ -20,7 +20,7 @@
     <dependency>
       <groupId>io.daff</groupId>
       <artifactId>utils</artifactId>
-      <version>1.0.0</version>
+      <version>${daff.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

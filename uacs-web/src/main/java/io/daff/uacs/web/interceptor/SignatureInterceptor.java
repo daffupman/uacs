@@ -1,6 +1,7 @@
 package io.daff.uacs.web.interceptor;
 
 import io.daff.uacs.web.interceptor.sign.ApiAccessAuthenticator;
+import io.daff.uacs.web.interceptor.sign.Signature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -36,8 +37,14 @@ public class SignatureInterceptor extends HandlerInterceptorAdapter {
         Parameter[] parameters = handlerMethod.getMethod().getParameters();
         Map<String, Object> params = flatParams(parameters);
 
+        Signature signature = new Signature.Builder().appId(request.getHeader(Signature.HEADER_APP_ID))
+                .timestamp(request.getHeader(Signature.HEADER_SIGNATURE))
+                .rawSignature(request.getHeader(Signature.HEADER_SIGNATURE))
+                .debug(request.getHeader(Signature.HEADER_DEBUG))
+                .bizParams(params)
+                .build();
         // 验证
-        apiAccessAuthenticator.auth(request, params);
+        apiAccessAuthenticator.auth(signature);
 
         return true;
     }

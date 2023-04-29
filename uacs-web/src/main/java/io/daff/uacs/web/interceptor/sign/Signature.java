@@ -1,10 +1,10 @@
 package io.daff.uacs.web.interceptor.sign;
 
 import io.daff.uacs.service.util.Md5Util;
+import io.daff.utils.common.StringUtil;
 import io.daff.web.exception.ParamValidateException;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
@@ -18,56 +18,50 @@ import java.util.TreeMap;
  */
 public class Signature {
 
-    private String appId;
-    private Long timestamp;
-    private String signature;
-    private Boolean debug;
+    /**
+     * 通用参数
+     */
+    private final String appId;
+    private final Long timestamp;
+    private final String rawSignature;
+    private final Boolean debug;
 
-    private static final String HEADER_APP_ID = "app_id";
-    private static final String HEADER_TIMESTAMP = "timestamp";
-    private static final String HEADER_SIGNATURE = "signature";
-    private static final String HEADER_DEBUG = "debug";
-    private static final Integer DEFAULT_CALL_INTERVAL = 1000 * 60 * 500;
+    /**
+     * 业务参数
+     */
+    private final Map<String, Object> bizParams;
 
-    public Signature build(HttpServletRequest request) {
-        if (request == null) {
-            throw new ParamValidateException("request not null");
-        }
+    public static final String HEADER_APP_ID = "app_id";
+    public static final String HEADER_TIMESTAMP = "timestamp";
+    public static final String HEADER_SIGNATURE = "signature";
+    public static final String HEADER_DEBUG = "debug";
+    public static final Integer DEFAULT_CALL_INTERVAL = 1000 * 60 * 500;
 
-        this.appId = request.getHeader(HEADER_APP_ID);
-        if (StringUtils.isEmpty(appId)) {
-            throw new ParamValidateException("app_id is null");
-        }
-
-        String timestampStr = request.getHeader(HEADER_TIMESTAMP);
-        if (StringUtils.isEmpty(timestampStr)) {
-            throw new ParamValidateException("timestamp is null");
-        }
-        try {
-            this.timestamp = Long.valueOf(timestampStr);
-        } catch (NumberFormatException e) {
-            throw new ParamValidateException("timestamp is not a number");
-        }
-
-        this.signature = request.getHeader(HEADER_SIGNATURE);
-        if (StringUtils.isEmpty(signature)) {
-            throw new ParamValidateException("signature is null");
-        }
-
-        this.debug = Boolean.valueOf(request.getHeader(HEADER_DEBUG));
-
-        return this;
+    private Signature(Builder builder) {
+        this.appId = builder.appId;
+        this.timestamp = builder.timestamp;
+        this.rawSignature = builder.rawSignature;
+        this.debug = builder.debug;
+        this.bizParams = builder.bizParams;
     }
 
     /**
      * 验签
      */
-    public boolean verify(Map<String, Object> params, String secret) {
-        params = sort(params);
-        params.put(HEADER_APP_ID, this.appId);
-        params.put(HEADER_TIMESTAMP, this.timestamp);
-        String signature = sign(params, secret);
-        return Objects.equals(this.signature, signature);
+    public boolean verify(String secret) {
+
+        if (secret == null) {
+            throw new ParamValidateException("密钥不合法");
+        }
+
+        TreeMap<String, Object> allParams = new TreeMap<>();
+        if (!CollectionUtils.isEmpty(bizParams)) {
+            allParams.putAll(bizParams);
+        }
+        allParams.put(HEADER_APP_ID, this.appId);
+        allParams.put(HEADER_TIMESTAMP, this.timestamp);
+        String signature = geneSign(allParams, secret);
+        return Objects.equals(this.rawSignature, signature);
     }
 
     /**
@@ -92,7 +86,7 @@ public class Signature {
      * @param secret 密钥
      * @return 签名串
      */
-    private String sign(Map<String, Object> params, String secret) {
+    private String geneSign(Map<String, Object> params, String secret) {
         StringBuilder sb = new StringBuilder("{");
         for (Map.Entry<String, Object> entry : params.entrySet()) {
             sb.append(entry.getKey()).append("=").append(entry.getValue()).append("#");
@@ -103,11 +97,74 @@ public class Signature {
     }
 
     /**
-     * 参数排序
+     * 建造者
      */
-    private Map<String, Object> sort(Map<String, Object> params) {
-        TreeMap<String, Object> map = new TreeMap<>(Comparator.naturalOrder());
-        map.putAll(params);
-        return map;
+    public static class Builder {
+
+        private String appId;
+        private Long timestamp;
+        private String rawSignature;
+        private Boolean debug;
+        private Map<String, Object> bizParams;
+
+        public Builder appId(String appId) {
+            if (!StringUtil.hasText(appId)) {
+                throw new ParamValidateException("app_id is null");
+            }
+            this.appId = appId;
+            return this;
+        }
+
+        public Builder timestamp(String timestampStr) {
+            if (timestampStr == null || !StringUtil.isInteger(timestampStr)) {
+                throw new ParamValidateException("timestamp is null");
+            }
+            this.timestamp = Long.valueOf(timestampStr);
+            return this;
+        }
+
+        public Builder rawSignature(String rawSignature) {
+            if (!StringUtil.hasText(rawSignature)) {
+                throw new ParamValidateException("signature is null");
+            }
+            this.rawSignature = rawSignature;
+            return this;
+        }
+
+        public Builder debug(String debug) {
+            if (StringUtil.hasText(debug)) {
+                this.debug = Boolean.TRUE.equals(Boolean.valueOf(debug));
+            }
+            return this;
+        }
+
+        public Builder bizParams(Map<String, Object> bizParams) {
+            if (!CollectionUtils.isEmpty(bizParams)) {
+                this.bizParams = sort(bizParams);
+            }
+            return this;
+        }
+
+        public Signature build() {
+            if (!StringUtil.hasText(appId)) {
+                throw new ParamValidateException("app_id is null");
+            }
+            if (timestamp == null) {
+                throw new ParamValidateException("timestamp is null");
+            }
+            if (!StringUtil.hasText(rawSignature)) {
+                throw new ParamValidateException("signature is null");
+            }
+            return new Signature(this);
+        }
+
+        /**
+         * 参数排序
+         */
+        private Map<String, Object> sort(Map<String, Object> params) {
+            TreeMap<String, Object> map = new TreeMap<>(Comparator.naturalOrder());
+            map.putAll(params);
+            return map;
+        }
     }
 }
